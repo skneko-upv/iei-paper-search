@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using IEIPaperSearch.DataExtraction.DBLP;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace IEIPaperSearch
 {
@@ -13,6 +8,7 @@ namespace IEIPaperSearch
     {
         public static void Main(string[] args)
         {
+            new DblpDataExtractor().ExtractData(@"C:\Users\Neko\Desktop\dblp.xml");
             CreateHostBuilder(args).Build().Run();
         }
 
