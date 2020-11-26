@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
 
-namespace IEIPaperSearch.DataExtraction.DBLP
+namespace IEIPaperSearch.DataSourceWrappers.DBLP
 {
     public class DblpDataExtractor
     {

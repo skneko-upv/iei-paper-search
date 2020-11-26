@@ -7,13 +7,13 @@ namespace IEIPaperSearch.Models
 {
     public class Article : Submission, IEquatable<Article>
     {
-        public int? StartPage { get; set; }
-        public int? EndPage { get; set; }
+        public string? StartPage { get; set; }
+        public string? EndPage { get; set; }
 
         public Issue PublishedIn { get; set; }
 
 
-        public Article(string title, int year, string url, int? startPage, int? endPage) : base(title, year, url)
+        public Article(string title, int year, string? url, string? startPage, string? endPage) : base(title, year, url)
         {
             StartPage = startPage;
             EndPage = endPage;

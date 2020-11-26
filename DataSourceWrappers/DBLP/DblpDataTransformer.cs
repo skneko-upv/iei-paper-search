@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace IEIPaperSearch.DataExtraction.DBLP
+namespace IEIPaperSearch.DataSourceWrappers.DBLP
 {
     public class DblpDataTransformer
     {

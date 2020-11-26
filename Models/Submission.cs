@@ -8,11 +8,11 @@ namespace IEIPaperSearch.Models
     {
         public string Title { get; set; }
         public int Year { get; set; }
-        public string URL { get; set; }
+        public string? URL { get; set; }
 
         public ICollection<Person> Authors = new HashSet<Person>();
 
-        protected Submission(string title, int year, string url)
+        protected Submission(string title, int year, string? url)
         {
             Title = title;
             Year = year;

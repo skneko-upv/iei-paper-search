@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DataSourceWrappers\**" />
+    <Content Remove="DataSourceWrappers\**" />
+    <EmbeddedResource Remove="DataSourceWrappers\**" />
+    <None Remove="DataSourceWrappers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
