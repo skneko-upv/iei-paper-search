@@ -12,6 +12,8 @@ namespace IEIPaperSearch.Models
 
         public Issue PublishedIn { get; set; }
 
+        private Article() : base()
+        { }
 
         public Article(string title, int year, string? url, string? startPage, string? endPage) : base(title, year, url)
         {
