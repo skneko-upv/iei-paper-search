@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace IEIPaperSearch.Models
 {
@@ -17,6 +18,14 @@ namespace IEIPaperSearch.Models
         private Person()
         { }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+
+        public Person(string nameAndSurnames)
+        {
+            var tokens = nameAndSurnames.Split(' ', count: 2).Select(t => t.Trim()).ToArray();
+
+            Name = tokens[0];
+            Surnames = tokens.Length > 1 ? tokens[1] : "";
+        }
 
         public Person(string name, string surnames)
         {

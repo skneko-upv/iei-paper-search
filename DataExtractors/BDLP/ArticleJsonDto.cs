@@ -11,7 +11,7 @@ namespace IEIPaperSearch.DataExtractors.BDLP
         public string Title { get; internal set; }
 
         [JsonProperty("author")]
-        public dynamic? Author { get; internal set; }
+        public dynamic? Authors { get; internal set; }
         
         [JsonProperty("pages")] 
         public string? Pages { get; internal set; }

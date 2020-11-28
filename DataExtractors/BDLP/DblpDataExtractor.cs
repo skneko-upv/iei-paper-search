@@ -1,4 +1,5 @@
 ﻿using IEIPaperSearch.Models;
+using IEIPaperSearch.Persistence;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,13 @@ namespace IEIPaperSearch.DataExtractors.BDLP
 {
     internal class DblpDataExtractor : IJsonDataExtractor<ICollection<Article>>
     {
+        private readonly PaperSearchContext context;
+
+        public DblpDataExtractor(PaperSearchContext context)
+        {
+            this.context = context;
+        }
+
         public ICollection<Article> Extract(string source)
         {
             var dtos = DeserializeJson(source);
@@ -39,8 +47,10 @@ namespace IEIPaperSearch.DataExtractors.BDLP
                     startPage: pages.Item1,
                     endPage: pages.Item2);
 
-                /* TODO article.Authors */
-                /* TODO article.PublishedIn */
+                article.Authors = ConsolidateAuthorsWithDatabase(
+                    article,
+                    (ICollection<string>)ToPeopleList(dto.Authors));
+                article.PublishedIn = ConsolidateIssueWithDatabase(article, dto);
 
                 articles.Add(article);
             }
@@ -48,38 +58,78 @@ namespace IEIPaperSearch.DataExtractors.BDLP
             return articles;
         }
 
+        private Issue ConsolidateIssueWithDatabase(Article article, ArticleJsonDto dto)
+        {
+            var journal = context.Journals.FirstOrDefault(j => j.Name == dto.Journal) ?? new Journal(dto.Journal);
+            var issue = journal.Issues.MatchingOrNew(new Issue(dto.Volume, dto.Number, month: null, journal));
+            journal.Issues.Add(issue);
+
+            issue.Articles.Add(article);
+
+            return issue;
+        }
+
+        private ICollection<Person> ConsolidateAuthorsWithDatabase(Article article, ICollection<string> authorNames)
+        {
+            var authors = new List<Person>();
+
+            foreach (var authorName in authorNames)
+            {
+                var person = context.People.MatchingOrNew(new Person(authorName));
+
+                person.AuthorOf.Add(article);
+                authors.Add(person);
+            }
+
+            return authors;
+        }
+
         string? ToUrl(dynamic? ee)
         {
-            if (ee is null)
+            var test = (ICollection<string>)ExtractContentList(ee);
+            return test.FirstOrDefault();
+        }
+
+        private static ICollection<string> ExtractContentList(dynamic property, string contentPropertyName = "content")
+        {
+            var list = new List<string>();
+
+            if (property is null)
             {
-                return null;
+                return list;
             }
 
-            if (ee is string)
+            if (property is string)
             {
-                return ee;
+                list.Add(property);
+                return list;
             }
 
-            if (ee is JObject && ee["content"]?.Value is string)
+            if (property is JObject && property[contentPropertyName]?.Value is string)
             {
-                return ee["content"].Value;
+                list.Add(property[contentPropertyName].Value);
+                return list;
             }
 
-            if (ee is JArray)
+            if (property is JArray)
             {
-                var first = ee.First;
-                if (first.Value is string)
+                foreach (var candidate in property)
                 {
-                    return first;
+                    if (candidate!.Value is string)
+                    {
+                        list.Add(candidate!.Value);
+                    }
+                    else
+                    {
+                        var content = candidate[contentPropertyName].Value;
+                        list.Add(content is string ? content : null);
+                    }
                 }
-                else
-                {
-                    var content = first["content"].Value;
-                    return content is string ? content : null;
-                }
+
+                return list;
             }
 
-            throw new ArgumentException("EE has a invalid shape.");
+            throw new ArgumentException($"Property {property} has an unexpected shape.");
         }
 
         (string?,string?) ToPagePair(string? pages)
@@ -95,5 +145,7 @@ namespace IEIPaperSearch.DataExtractors.BDLP
 
             return (tokens[0], tokens.Count() > 1 ? tokens[1] : null);
         }
+
+        ICollection<string> ToPeopleList(dynamic? authors) => ExtractContentList(authors);
     }
 }

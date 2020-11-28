@@ -1,11 +1,10 @@
-using IEIPaperSearch.DataExtractors.BDLP;
 using IEIPaperSearch.Persistence;
+using IEIPaperSearch.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.IO;
 
 namespace IEIPaperSearch
 {
@@ -13,9 +12,13 @@ namespace IEIPaperSearch
     {
         public static void Main(string[] args)
         {
-            //new DblpDataExtractor().Extract(File.ReadAllText(@"C:\Users\Neko\Desktop\dblp-solo-article-1.json")); // FIXME remove this
-
             var host = CreateHostBuilder(args).Build();
+
+            using (var scope = host.Services.CreateScope())
+            {
+                var loader = scope.ServiceProvider.GetRequiredService<IDataLoaderService>();
+                loader.Test();
+            }
 
             CreateDbIfNotExists(host);
 

@@ -8,9 +8,9 @@ namespace IEIPaperSearch.Models
     {
         public Guid Id { get; private set; }
 
-        public int Volume { get; set; }
-        public int Number { get; set; }
-        public int Month { get; set; }
+        public string? Volume { get; set; }
+        public string? Number { get; set; }
+        public int? Month { get; set; }
 
         public Journal Journal { get; set; }
         public ICollection<Article> Articles { get; set; } = new HashSet<Article>();
@@ -20,7 +20,7 @@ namespace IEIPaperSearch.Models
         { }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
-        public Issue(int volume, int number, int month, Journal journal)
+        public Issue(string? volume, string? number, int? month, Journal journal)
         {
             Volume = volume;
             Number = number;
