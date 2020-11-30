@@ -1,7 +1,11 @@
 ﻿using IEIPaperSearch.DataExtractors.BDLP;
+using IEIPaperSearch.DataExtractors.BibTeX;
+using IEIPaperSearch.Models;
 using IEIPaperSearch.Persistence;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace IEIPaperSearch.Services
 {
@@ -22,10 +26,12 @@ namespace IEIPaperSearch.Services
 
         public void Test()
         {
-            var extractor = new DblpDataExtractor(context);
-            var articles = extractor.Extract(File.ReadAllText(@"C:\Users\Neko\Desktop\dblp-solo-article-1.json"));
+            var extractor = new BibTeXDataExtractor(context);
+            var submissions = extractor.Extract(File.ReadAllText(@"E:\Proyectos Visual Studio\iei-paper-search-master\Json\sample_array.json"));
 
-            context.Articles.AddRange(articles);
+            context.Books.AddRange((ICollection<Book>)submissions.Where(s => s is Book).ToList());
+            context.Articles.AddRange((ICollection<Article>)submissions.Where(s => s is Article).ToList());
+            context.InProceedings.AddRange((ICollection<InProceedings>)submissions.Where(s => s is InProceedings).ToList());
             context.SaveChanges();
         }
     }
