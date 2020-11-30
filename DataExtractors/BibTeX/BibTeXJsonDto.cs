@@ -1,11 +1,10 @@
 ﻿#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
-namespace IEIPaperSearch.DataExtractors.BibTeX
+namespace IEIPaperSearch.DataExtractors.Bibtex
 {
-    public class BibTeXJsonDto
+    public class BibtexJsonDto
     {
         [JsonProperty("type")]
         public string? Type { get; internal set; }

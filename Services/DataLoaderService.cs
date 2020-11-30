@@ -1,5 +1,5 @@
 ﻿using IEIPaperSearch.DataExtractors.BDLP;
-using IEIPaperSearch.DataExtractors.BibTeX;
+using IEIPaperSearch.DataExtractors.Bibtex;
 using IEIPaperSearch.Models;
 using IEIPaperSearch.Persistence;
 using System;
@@ -26,12 +26,12 @@ namespace IEIPaperSearch.Services
 
         public void Test()
         {
-            var extractor = new BibTeXDataExtractor(context);
-            var submissions = extractor.Extract(File.ReadAllText(@"E:\Proyectos Visual Studio\iei-paper-search-master\Json\sample_array.json"));
+            var extractor = new BibtexDataExtractor(context);
+            var submissions = extractor.Extract(File.ReadAllText(@"C:\Users\Neko\Desktop\sample_array.json"));
 
-            context.Books.AddRange((ICollection<Book>)submissions.Where(s => s is Book).ToList());
-            context.Articles.AddRange((ICollection<Article>)submissions.Where(s => s is Article).ToList());
-            context.InProceedings.AddRange((ICollection<InProceedings>)submissions.Where(s => s is InProceedings).ToList());
+            context.Books.AddRange(submissions.Where(s => s is Book).Select(s => (Book)s).ToList());
+            context.Articles.AddRange(submissions.Where(s => s is Article).Select(s => (Article)s).ToList());
+            context.InProceedings.AddRange(submissions.Where(s => s is InProceedings).Select(s => (InProceedings)s).ToList());
             context.SaveChanges();
         }
     }

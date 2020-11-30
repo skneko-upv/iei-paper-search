@@ -5,22 +5,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace IEIPaperSearch.DataExtractors.BibTeX
+namespace IEIPaperSearch.DataExtractors.Bibtex
 {
-    internal class BibTeXDataExtractor : IJsonDataExtractor<ICollection<Submission>>
+    internal class BibtexDataExtractor : IJsonDataExtractor<ICollection<Submission>>
     {
         private readonly PaperSearchContext context;
 
-        public BibTeXDataExtractor(PaperSearchContext context)
+        public BibtexDataExtractor(PaperSearchContext context)
         {
             this.context = context;
         }
 
-        public ICollection<Submission> Extract(string source)
-        {
-            
-            return DeserializeJson(source);
-        }
+        public ICollection<Submission> Extract(string source) => DeserializeJson(source);
 
         ICollection<Submission> DeserializeJson(string source)
         {
@@ -30,34 +26,31 @@ namespace IEIPaperSearch.DataExtractors.BibTeX
             IList<JToken> booksJson = GetArrayOrObject(root["books"]!);
             IList<JToken> inProceedingsJson = GetArrayOrObject(root["inproceedings"]!);
 
-            IList<BibTeXJsonDto> articlesDtos = articlesJson.Select(a => {
-                var dto = a.ToObject<BibTeXJsonDto>()!;
+            IList<BibtexJsonDto> articlesDtos = articlesJson.Select(a => {
+                var dto = a.ToObject<BibtexJsonDto>()!;
                 dto.Type = "article";
                 return dto;
             }).ToList();
-            IList<BibTeXJsonDto> booksDtos = booksJson.Select(a => {
-                var dto = a.ToObject<BibTeXJsonDto>()!;
+            IList<BibtexJsonDto> booksDtos = booksJson.Select(a => {
+                var dto = a.ToObject<BibtexJsonDto>()!;
                 dto.Type = "book";
                 return dto;
             }).ToList();
-            IList<BibTeXJsonDto> inProceedingsDtos = inProceedingsJson.Select(a => {
-                var dto = a.ToObject<BibTeXJsonDto>()!;
+            IList<BibtexJsonDto> inProceedingsDtos = inProceedingsJson.Select(a => {
+                var dto = a.ToObject<BibtexJsonDto>()!;
                 dto.Type = "inproceedings";
                 return dto;
             }).ToList();
 
-            IList<BibTeXJsonDto> dtos = articlesDtos.Union(booksDtos).Union(inProceedingsDtos).ToList();
+            IList<BibtexJsonDto> dtos = articlesDtos.Union(booksDtos).Union(inProceedingsDtos).ToList();
 
             return ToCanonicalModel(dtos);
         }
 
-        IList<JToken> GetArrayOrObject(dynamic jsonObject)
-        {
-            if (jsonObject is JArray) return ((JToken)jsonObject).Children().ToList();
-            return new List<JToken>() { jsonObject };
-        }
+        IList<JToken> GetArrayOrObject(dynamic jsonObject) => 
+            jsonObject is JArray ? ((JToken)jsonObject).Children().ToList() : new List<JToken>() { jsonObject };
 
-        ICollection<Submission> ToCanonicalModel(ICollection<BibTeXJsonDto> dtos)
+        ICollection<Submission> ToCanonicalModel(ICollection<BibtexJsonDto> dtos)
         {
             var submissions = new List<Submission>();
 
@@ -116,7 +109,7 @@ namespace IEIPaperSearch.DataExtractors.BibTeX
             return submissions;
         }
 
-        private Issue ConsolidateIssueWithDatabase(Article article, BibTeXJsonDto dto)
+        private Issue ConsolidateIssueWithDatabase(Article article, BibtexJsonDto dto)
         {
             var journal = context.Journals.FirstOrDefault(j => j.Name == dto.Journal) ?? new Journal(dto.Journal!);
             var issue = journal.Issues.MatchingOrNew(new Issue(dto.Volume, dto.Number, month: null, journal));
