@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace IEIPaperSearch.Models
 {
     public class Journal    // Revista
     {
-        public Guid Id { get; private set; }
+        public int Id { get; private set; }
 
         public string Name { get; set; }
 

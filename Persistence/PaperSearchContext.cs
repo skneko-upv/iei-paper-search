@@ -15,6 +15,7 @@ namespace IEIPaperSearch.Persistence
         public DbSet<InProceedings> InProceedings { get; set; }
         public DbSet<Journal> Journals { get; set; }
         public DbSet<Person> People { get; set; }
+        public DbSet<Issue> Issues { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         { }

@@ -15,6 +15,10 @@
   <ItemGroup>
     <Compile Remove="Migrations\20201130182059_Test.cs" />
     <Compile Remove="Migrations\20201130182059_Test.Designer.cs" />
+    <Compile Remove="Migrations\20201130191523_Test.cs" />
+    <Compile Remove="Migrations\20201130191523_Test.Designer.cs" />
+    <Compile Remove="Migrations\20201130193209_Test.cs" />
+    <Compile Remove="Migrations\20201130193209_Test.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

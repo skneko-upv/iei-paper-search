@@ -7,7 +7,7 @@ namespace IEIPaperSearch.Models
 {
     public class Person : IEquatable<Person>
     {
-        public Guid Id { get; private set; }
+        public int Id { get; private set; }
 
         public string Name { get; set; }
         public string Surnames { get; set; }

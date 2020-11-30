@@ -26,23 +26,23 @@ namespace IEIPaperSearch.DataExtractors.Bibtex
             IList<JToken> booksJson = GetArrayOrObject(root["books"]!);
             IList<JToken> inProceedingsJson = GetArrayOrObject(root["inproceedings"]!);
 
-            IList<BibtexJsonDto> articlesDtos = articlesJson.Select(a => {
-                var dto = a.ToObject<BibtexJsonDto>()!;
+            IList<SubmissionJsonDto> articlesDtos = articlesJson.Select(a => {
+                var dto = a.ToObject<SubmissionJsonDto>()!;
                 dto.Type = "article";
                 return dto;
             }).ToList();
-            IList<BibtexJsonDto> booksDtos = booksJson.Select(a => {
-                var dto = a.ToObject<BibtexJsonDto>()!;
+            IList<SubmissionJsonDto> booksDtos = booksJson.Select(a => {
+                var dto = a.ToObject<SubmissionJsonDto>()!;
                 dto.Type = "book";
                 return dto;
             }).ToList();
-            IList<BibtexJsonDto> inProceedingsDtos = inProceedingsJson.Select(a => {
-                var dto = a.ToObject<BibtexJsonDto>()!;
+            IList<SubmissionJsonDto> inProceedingsDtos = inProceedingsJson.Select(a => {
+                var dto = a.ToObject<SubmissionJsonDto>()!;
                 dto.Type = "inproceedings";
                 return dto;
             }).ToList();
 
-            IList<BibtexJsonDto> dtos = articlesDtos.Union(booksDtos).Union(inProceedingsDtos).ToList();
+            IList<SubmissionJsonDto> dtos = articlesDtos.Union(booksDtos).Union(inProceedingsDtos).ToList();
 
             return ToCanonicalModel(dtos);
         }
@@ -50,7 +50,7 @@ namespace IEIPaperSearch.DataExtractors.Bibtex
         IList<JToken> GetArrayOrObject(dynamic jsonObject) => 
             jsonObject is JArray ? ((JToken)jsonObject).Children().ToList() : new List<JToken>() { jsonObject };
 
-        ICollection<Submission> ToCanonicalModel(ICollection<BibtexJsonDto> dtos)
+        ICollection<Submission> ToCanonicalModel(ICollection<SubmissionJsonDto> dtos)
         {
             var submissions = new List<Submission>();
 
@@ -95,8 +95,8 @@ namespace IEIPaperSearch.DataExtractors.Bibtex
                                 url: null,
                                 dto.BookTitle!,
                                 edition: null,
-                                startPage: pages.Item1 is null ? null : (int?)int.Parse(pages.Item1),
-                                endPage: pages.Item2 is null ? null : (int?)int.Parse(pages.Item2));
+                                startPage: pages.Item1 is null ? null : pages.Item1,
+                                endPage: pages.Item2 is null ? null : pages.Item2);
 
                             inProceedings.Authors = ToPeopleList(dto.Authors);
 
@@ -109,7 +109,7 @@ namespace IEIPaperSearch.DataExtractors.Bibtex
             return submissions;
         }
 
-        private Issue ConsolidateIssueWithDatabase(Article article, BibtexJsonDto dto)
+        private Issue ConsolidateIssueWithDatabase(Article article, SubmissionJsonDto dto)
         {
             var journal = context.Journals.FirstOrDefault(j => j.Name == dto.Journal) ?? new Journal(dto.Journal!);
             var issue = journal.Issues.MatchingOrNew(new Issue(dto.Volume, dto.Number, month: null, journal));
@@ -118,63 +118,6 @@ namespace IEIPaperSearch.DataExtractors.Bibtex
             issue.Articles.Add(article);
 
             return issue;
-        }
-
-        private ICollection<Person> ConsolidateAuthorsWithDatabase(Article article, ICollection<string> authorNames)
-        {
-            var authors = new List<Person>();
-
-            foreach (var authorName in authorNames)
-            {
-                var person = context.People.MatchingOrNew(new Person(authorName));
-
-                person.AuthorOf.Add(article);
-                authors.Add(person);
-            }
-
-            return authors;
-        }
-
-        private static ICollection<string> ExtractContentList(dynamic property, string contentPropertyName = "content")
-        {
-            var list = new List<string>();
-
-            if (property is null)
-            {
-                return list;
-            }
-
-            if (property is string)
-            {
-                list.Add(property);
-                return list;
-            }
-
-            if (property is JObject && property[contentPropertyName]?.Value is string)
-            {
-                list.Add(property[contentPropertyName].Value);
-                return list;
-            }
-
-            if (property is JArray)
-            {
-                foreach (var candidate in property)
-                {
-                    if (candidate!.Value is string)
-                    {
-                        list.Add(candidate!.Value);
-                    }
-                    else
-                    {
-                        var content = candidate[contentPropertyName].Value;
-                        list.Add(content is string ? content : null);
-                    }
-                }
-
-                return list;
-            }
-
-            throw new ArgumentException($"Property {property} has an unexpected shape.");
         }
 
         (string?, string?) ToPagePair(string? pages)

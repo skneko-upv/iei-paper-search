@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IEIPaperSearch.Migrations
 {
     [DbContext(typeof(PaperSearchContext))]
-    [Migration("20201128111201_MinorFixes")]
-    partial class MinorFixes
+    [Migration("20201130193340_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,12 +23,13 @@ namespace IEIPaperSearch.Migrations
 
             modelBuilder.Entity("IEIPaperSearch.Models.Issue", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<Guid>("JournalId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("JournalId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("Month")
                         .HasColumnType("int");
@@ -43,14 +44,15 @@ namespace IEIPaperSearch.Migrations
 
                     b.HasIndex("JournalId");
 
-                    b.ToTable("Issue");
+                    b.ToTable("Issues");
                 });
 
             modelBuilder.Entity("IEIPaperSearch.Models.Journal", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -63,9 +65,10 @@ namespace IEIPaperSearch.Migrations
 
             modelBuilder.Entity("IEIPaperSearch.Models.Person", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -82,16 +85,17 @@ namespace IEIPaperSearch.Migrations
 
             modelBuilder.Entity("IEIPaperSearch.Models.Submission", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("PersonId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("PersonId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -119,8 +123,8 @@ namespace IEIPaperSearch.Migrations
                     b.Property<string>("EndPage")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("PublishedInId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("PublishedInId")
+                        .HasColumnType("int");
 
                     b.Property<string>("StartPage")
                         .HasColumnType("nvarchar(max)");
@@ -150,16 +154,15 @@ namespace IEIPaperSearch.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Edition")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EndPage")
+                    b.Property<string>("EndPage")
                         .HasColumnName("InProceedings_EndPage")
-                        .HasColumnType("int");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StartPage")
+                    b.Property<string>("StartPage")
                         .HasColumnName("InProceedings_StartPage")
-                        .HasColumnType("int");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("InProceedings");
                 });

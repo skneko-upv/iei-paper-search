@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace IEIPaperSearch.DataExtractors.Bibtex
 {
-    public class BibtexJsonDto
+    internal class SubmissionJsonDto
     {
         [JsonProperty("type")]
         public string? Type { get; internal set; }

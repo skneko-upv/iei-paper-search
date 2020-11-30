@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace IEIPaperSearch.Migrations
 {
@@ -11,7 +10,8 @@ namespace IEIPaperSearch.Migrations
                 name: "Journals",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
@@ -23,7 +23,8 @@ namespace IEIPaperSearch.Migrations
                 name: "People",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(nullable: false),
                     Surnames = table.Column<string>(nullable: false)
                 },
@@ -33,20 +34,21 @@ namespace IEIPaperSearch.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Issue",
+                name: "Issues",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
-                    Volume = table.Column<int>(nullable: false),
-                    Number = table.Column<int>(nullable: false),
-                    Month = table.Column<int>(nullable: false),
-                    JournalId = table.Column<Guid>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Volume = table.Column<string>(nullable: true),
+                    Number = table.Column<string>(nullable: true),
+                    Month = table.Column<int>(nullable: true),
+                    JournalId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Issue", x => x.Id);
+                    table.PrimaryKey("PK_Issues", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Issue_Journals_JournalId",
+                        name: "FK_Issues_Journals_JournalId",
                         column: x => x.JournalId,
                         principalTable: "Journals",
                         principalColumn: "Id",
@@ -57,28 +59,29 @@ namespace IEIPaperSearch.Migrations
                 name: "Submission",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(nullable: false),
                     Year = table.Column<int>(nullable: false),
                     URL = table.Column<string>(nullable: true),
                     Discriminator = table.Column<string>(nullable: false),
-                    PersonId = table.Column<Guid>(nullable: true),
+                    PersonId = table.Column<int>(nullable: true),
                     StartPage = table.Column<string>(nullable: true),
                     EndPage = table.Column<string>(nullable: true),
-                    PublishedInId = table.Column<Guid>(nullable: true),
+                    PublishedInId = table.Column<int>(nullable: true),
                     Publisher = table.Column<string>(nullable: true),
                     Conference = table.Column<string>(nullable: true),
                     Edition = table.Column<string>(nullable: true),
-                    InProceedings_StartPage = table.Column<int>(nullable: true),
-                    InProceedings_EndPage = table.Column<int>(nullable: true)
+                    InProceedings_StartPage = table.Column<string>(nullable: true),
+                    InProceedings_EndPage = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Submission", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Submission_Issue_PublishedInId",
+                        name: "FK_Submission_Issues_PublishedInId",
                         column: x => x.PublishedInId,
-                        principalTable: "Issue",
+                        principalTable: "Issues",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -90,8 +93,8 @@ namespace IEIPaperSearch.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Issue_JournalId",
-                table: "Issue",
+                name: "IX_Issues_JournalId",
+                table: "Issues",
                 column: "JournalId");
 
             migrationBuilder.CreateIndex(
@@ -111,7 +114,7 @@ namespace IEIPaperSearch.Migrations
                 name: "Submission");
 
             migrationBuilder.DropTable(
-                name: "Issue");
+                name: "Issues");
 
             migrationBuilder.DropTable(
                 name: "People");

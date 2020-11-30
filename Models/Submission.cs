@@ -6,7 +6,7 @@ namespace IEIPaperSearch.Models
 {
     public abstract class Submission : IEquatable<Submission>
     {
-        public Guid Id { get; private set; }
+        public int Id { get; private set; }
 
         public string Title { get; set; }
         public int Year { get; set; }

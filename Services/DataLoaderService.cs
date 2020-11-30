@@ -1,5 +1,6 @@
 ﻿using IEIPaperSearch.DataExtractors.BDLP;
 using IEIPaperSearch.DataExtractors.Bibtex;
+using IEIPaperSearch.DataExtractors.IeeeXplore;
 using IEIPaperSearch.Models;
 using IEIPaperSearch.Persistence;
 using System;
@@ -26,8 +27,8 @@ namespace IEIPaperSearch.Services
 
         public void Test()
         {
-            var extractor = new BibtexDataExtractor(context);
-            var submissions = extractor.Extract(File.ReadAllText(@"C:\Users\Neko\Desktop\sample_array.json"));
+            var extractor = new IeeeXploreDataExtractor(context);
+            var submissions = extractor.Extract(File.ReadAllText(@"C:\Users\Neko\Desktop\ieeeXplore_2018-2020-short.json"));
 
             context.Books.AddRange(submissions.Where(s => s is Book).Select(s => (Book)s).ToList());
             context.Articles.AddRange(submissions.Where(s => s is Article).Select(s => (Article)s).ToList());

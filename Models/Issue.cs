@@ -6,7 +6,7 @@ namespace IEIPaperSearch.Models
 {
     public class Issue : IEquatable<Issue>  // Ejemplar
     {
-        public Guid Id { get; private set; }
+        public int Id { get; private set; }
 
         public string? Volume { get; set; }
         public string? Number { get; set; }
