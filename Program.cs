@@ -1,5 +1,5 @@
 using IEIPaperSearch.Persistence;
-using IEIPaperSearch.Services;
+using IEIPaperSearch.Services.DataLoaders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

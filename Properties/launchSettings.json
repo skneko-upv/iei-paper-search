@@ -1,4 +1,4 @@
-﻿{
+{
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
@@ -18,10 +18,13 @@
     "IEIPaperSearch": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+        "IEIPS_JSONSRC_IEEEXPLORE": "C:\\Users\\Neko\\Desktop\\ieeeXplore_2018-2020-short.json",
+        "IEIPS_JSONSRC_DBLP": "C:\\Users\\Neko\\Desktop\\DBLP-SOLO_ARTICLE_SHORT.json",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "IEIPS_JSONSRC_BIBTEX": "C:\\Users\\Neko\\Desktop\\sample_array.json"
+      },
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
     }
   }
 }

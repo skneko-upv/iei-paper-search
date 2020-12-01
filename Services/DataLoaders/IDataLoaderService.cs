@@ -1,4 +1,4 @@
-﻿namespace IEIPaperSearch.Services
+﻿namespace IEIPaperSearch.Services.DataLoaders
 {
     internal interface IDataLoaderService
     {

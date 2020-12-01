@@ -1,6 +1,6 @@
 ﻿namespace IEIPaperSearch.DataExtractors
 {
-    internal interface IDataExtractor<S,D>
+    internal interface IDataExtractor<S, D>
     {
         public D Extract(S source);
     }
