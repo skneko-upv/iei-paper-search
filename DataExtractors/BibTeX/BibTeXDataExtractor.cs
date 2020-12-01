@@ -11,6 +11,13 @@ namespace IEIPaperSearch.DataExtractors.Bibtex
     {
         private readonly PaperSearchContext context;
 
+        private readonly List<Article> articles = new List<Article>();
+        private readonly List<Journal> journals = new List<Journal>();
+        private readonly List<Person> people = new List<Person>();
+        private readonly List<Issue> issues = new List<Issue>();
+        private readonly List<Book> books = new List<Book>();
+        private readonly List<InProceedings> inProceedings = new List<InProceedings>();
+
         public BibtexDataExtractor(PaperSearchContext context)
         {
             this.context = context;
@@ -44,16 +51,15 @@ namespace IEIPaperSearch.DataExtractors.Bibtex
 
             IList<SubmissionJsonDto> dtos = articlesDtos.Union(booksDtos).Union(inProceedingsDtos).ToList();
 
-            return ToCanonicalModel(dtos);
+            ToCanonicalModel(dtos);
+            return articles.Select(a => (Submission)a).Union(books).Union(inProceedings).ToList();
         }
 
         IList<JToken> GetArrayOrObject(dynamic jsonObject) => 
             jsonObject is JArray ? ((JToken)jsonObject).Children().ToList() : new List<JToken>() { jsonObject };
 
-        ICollection<Submission> ToCanonicalModel(ICollection<SubmissionJsonDto> dtos)
+        void ToCanonicalModel(ICollection<SubmissionJsonDto> dtos)
         {
-            var submissions = new List<Submission>();
-
             foreach (var dto in dtos)
             {
                 var pages = ToPagePair(dto.Pages);
@@ -68,10 +74,10 @@ namespace IEIPaperSearch.DataExtractors.Bibtex
                                 startPage: pages.Item1,
                                 endPage: pages.Item2);
 
-                            article.Authors = ToPeopleList(dto.Authors);
-                            article.PublishedIn = ConsolidateIssueWithDatabase(article, dto);
+                            article.Authors = ConsolidateAuthorsWithDatabase(ToPeopleList(dto.Authors));
+                            article.PublishedIn = ConsolidateIssueWithDatabase(dto);
 
-                            submissions.Add(article);
+                            articles.Add(article);
                             break;
                         }
                     case "book":
@@ -82,14 +88,14 @@ namespace IEIPaperSearch.DataExtractors.Bibtex
                                 url: null,
                                 dto.Publisher!);
 
-                            book.Authors = ToPeopleList(dto.Authors);
+                            book.Authors = ConsolidateAuthorsWithDatabase(ToPeopleList(dto.Authors));
 
-                            submissions.Add(book);
+                            books.Add(book);
                             break;
                         }
                     case "inproceedings":
                         {
-                            var inProceedings = new InProceedings(
+                            var inProceedingsElement = new InProceedings(
                                 dto.Title,
                                 dto.Year,
                                 url: null,
@@ -98,26 +104,40 @@ namespace IEIPaperSearch.DataExtractors.Bibtex
                                 startPage: pages.Item1 is null ? null : pages.Item1,
                                 endPage: pages.Item2 is null ? null : pages.Item2);
 
-                            inProceedings.Authors = ToPeopleList(dto.Authors);
+                            inProceedingsElement.Authors = ConsolidateAuthorsWithDatabase(ToPeopleList(dto.Authors));
 
-                            submissions.Add(inProceedings);
+                            inProceedings.Add(inProceedingsElement);
                             break;
                         }
                 }
             }
-
-            return submissions;
         }
-
-        private Issue ConsolidateIssueWithDatabase(Article article, SubmissionJsonDto dto)
+        private Issue? ConsolidateIssueWithDatabase(SubmissionJsonDto dto)
         {
-            var journal = context.Journals.FirstOrDefault(j => j.Name == dto.Journal) ?? new Journal(dto.Journal!);
-            var issue = journal.Issues.MatchingOrNew(new Issue(dto.Volume, dto.Number, month: null, journal));
-            journal.Issues.Add(issue);
+            if (dto.Journal is null) return null;
 
-            issue.Articles.Add(article);
+            var journal = journals.MatchingOrNew(new Journal(dto.Journal));
+            journals.Add(journal);
+
+            var issue = journal.Issues.MatchingOrNew(new Issue(dto.Volume, dto.Number, month: null, journal));
+            issues.Add(issue);
 
             return issue;
+        }
+
+        private ICollection<Person> ConsolidateAuthorsWithDatabase(ICollection<string> authorNames)
+        {
+            var authors = new List<Person>();
+
+            foreach (var authorName in authorNames)
+            {
+                var person = people.MatchingOrNew(new Person(authorName));
+                people.Add(person);
+
+                authors.Add(person);
+            }
+
+            return authors;
         }
 
         (string?, string?) ToPagePair(string? pages)
@@ -134,10 +154,9 @@ namespace IEIPaperSearch.DataExtractors.Bibtex
             return (tokens[0], tokens.Count() > 1 ? tokens[1] : null);
         }
 
-        ICollection<Person> ToPeopleList(string authors) => 
+        ICollection<string> ToPeopleList(string authors) => 
             authors.Split(',')
                 .Select(p => p.Trim())
-                .Select(name => new Person(name))
                 .ToList();
     }
 }

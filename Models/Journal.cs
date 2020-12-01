@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace IEIPaperSearch.Models
 {
-    public class Journal    // Revista
+    public class Journal : IEquatable<Journal>  // Revista
     {
         public int Id { get; private set; }
 
@@ -19,5 +21,7 @@ namespace IEIPaperSearch.Models
         {
             Name = name;
         }
+        public bool Equals([AllowNull] Journal other)
+            => (other != null) && (Name == other.Name);
     }
 }

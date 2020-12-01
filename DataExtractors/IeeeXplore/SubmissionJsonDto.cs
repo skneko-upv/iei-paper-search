@@ -39,5 +39,8 @@ namespace IEIPaperSearch.DataExtractors.IeeeXplore
 
         [JsonProperty("conference_dates")]
         public string? ConferenceDates { get; internal set; }
+
+        [JsonProperty("publication_date")]
+        public string? PublicationDate { get; internal set; }
     }
 }

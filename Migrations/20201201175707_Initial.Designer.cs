@@ -10,23 +10,23 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IEIPaperSearch.Migrations
 {
     [DbContext(typeof(PaperSearchContext))]
-    [Migration("20201130193340_Initial")]
+    [Migration("20201201175707_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.10")
+                .UseIdentityColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "5.0.0");
 
             modelBuilder.Entity("IEIPaperSearch.Models.Issue", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<int>("JournalId")
                         .HasColumnType("int");
@@ -52,7 +52,7 @@ namespace IEIPaperSearch.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -68,7 +68,7 @@ namespace IEIPaperSearch.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -88,14 +88,11 @@ namespace IEIPaperSearch.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PersonId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -109,11 +106,24 @@ namespace IEIPaperSearch.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PersonId");
-
                     b.ToTable("Submission");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("Submission");
+                });
+
+            modelBuilder.Entity("PersonSubmission", b =>
+                {
+                    b.Property<int>("AuthorOfId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AuthorsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AuthorOfId", "AuthorsId");
+
+                    b.HasIndex("AuthorsId");
+
+                    b.ToTable("PersonSubmission");
                 });
 
             modelBuilder.Entity("IEIPaperSearch.Models.Article", b =>
@@ -121,13 +131,15 @@ namespace IEIPaperSearch.Migrations
                     b.HasBaseType("IEIPaperSearch.Models.Submission");
 
                     b.Property<string>("EndPage")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Article_EndPage");
 
                     b.Property<int>("PublishedInId")
                         .HasColumnType("int");
 
                     b.Property<string>("StartPage")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Article_StartPage");
 
                     b.HasIndex("PublishedInId");
 
@@ -157,11 +169,9 @@ namespace IEIPaperSearch.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EndPage")
-                        .HasColumnName("InProceedings_EndPage")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("StartPage")
-                        .HasColumnName("InProceedings_StartPage")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("InProceedings");
@@ -174,13 +184,23 @@ namespace IEIPaperSearch.Migrations
                         .HasForeignKey("JournalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Journal");
                 });
 
-            modelBuilder.Entity("IEIPaperSearch.Models.Submission", b =>
+            modelBuilder.Entity("PersonSubmission", b =>
                 {
+                    b.HasOne("IEIPaperSearch.Models.Submission", null)
+                        .WithMany()
+                        .HasForeignKey("AuthorOfId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("IEIPaperSearch.Models.Person", null)
-                        .WithMany("AuthorOf")
-                        .HasForeignKey("PersonId");
+                        .WithMany()
+                        .HasForeignKey("AuthorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("IEIPaperSearch.Models.Article", b =>
@@ -190,6 +210,18 @@ namespace IEIPaperSearch.Migrations
                         .HasForeignKey("PublishedInId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("PublishedIn");
+                });
+
+            modelBuilder.Entity("IEIPaperSearch.Models.Issue", b =>
+                {
+                    b.Navigation("Articles");
+                });
+
+            modelBuilder.Entity("IEIPaperSearch.Models.Journal", b =>
+                {
+                    b.Navigation("Issues");
                 });
 #pragma warning restore 612, 618
         }

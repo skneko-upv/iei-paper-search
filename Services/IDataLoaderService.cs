@@ -4,6 +4,10 @@
     {
         public void LoadFromAllSources();
 
-        public void Test();
+        public void LoadFromDblp();
+
+        public void LoadFromIeeeXplore();
+
+        public void LoadFromBibtex();
     }
 }

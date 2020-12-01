@@ -21,6 +21,9 @@ namespace IEIPaperSearch.Persistence
         { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        { }
+        {
+            modelBuilder.Entity<Submission>()
+                .HasMany(s => s.Authors).WithMany(p => p.AuthorOf);
+        }
     }
 }

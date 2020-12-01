@@ -3,6 +3,7 @@ using IEIPaperSearch.Persistence;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace IEIPaperSearch.DataExtractors.IeeeXplore
@@ -10,6 +11,13 @@ namespace IEIPaperSearch.DataExtractors.IeeeXplore
     internal class IeeeXploreDataExtractor : IJsonDataExtractor<ICollection<Submission>>
     {
         private readonly PaperSearchContext context;
+
+        private readonly List<Article> articles = new List<Article>();
+        private readonly List<Journal> journals = new List<Journal>();
+        private readonly List<Person> people = new List<Person>();
+        private readonly List<Issue> issues = new List<Issue>();
+        private readonly List<Book> books = new List<Book>();
+        private readonly List<InProceedings> inProceedings = new List<InProceedings>();
 
         public IeeeXploreDataExtractor(PaperSearchContext context)
         {
@@ -19,7 +27,8 @@ namespace IEIPaperSearch.DataExtractors.IeeeXplore
         public ICollection<Submission> Extract(string source)
         {
             var dtos = DeserializeJson(source);
-            return ToCanonicalModel(dtos);
+            ToCanonicalModel(dtos);
+            return articles.Select(a => (Submission)a).Union(books).Union(inProceedings).ToList();
         }
 
         ICollection<SubmissionJsonDto> DeserializeJson(string source)
@@ -33,10 +42,8 @@ namespace IEIPaperSearch.DataExtractors.IeeeXplore
             return submissionsDtos;
         }
 
-        ICollection<Submission> ToCanonicalModel(ICollection<SubmissionJsonDto> dtos)
+        void ToCanonicalModel(ICollection<SubmissionJsonDto> dtos)
         {
-            var submissions = new List<Submission>();
-
             foreach (var dto in dtos)
             {
                 switch (dto.ContentType)
@@ -51,19 +58,19 @@ namespace IEIPaperSearch.DataExtractors.IeeeXplore
                                 startPage: dto.StartPage,
                                 endPage: dto.EndPage);
 
-                            article.Authors = ToPeopleList(dto.Authors.Authors);
+                            article.Authors = ConsolidateAuthorsWithDatabase(ToPeopleList(dto.Authors.Authors));
                             article.PublishedIn = new Issue(
                                 dto.Volume, 
                                 dto.PublicationNumber, 
-                                month: null,                            // TODO
+                                month: ToMonth(dto.PublicationDate),
                                 new Journal(dto.PublicationTitle));
 
-                            submissions.Add(article);
+                            articles.Add(article);
                             break;
                         }
                     case "Conferences":
                         {
-                            var inProceedings = new InProceedings(
+                            var inProceedingsElement = new InProceedings(
                                 dto.Title,
                                 dto.PublicationYear,
                                 dto.PdfUrl,
@@ -72,20 +79,53 @@ namespace IEIPaperSearch.DataExtractors.IeeeXplore
                                 dto.StartPage,
                                 dto.EndPage);
 
-                            inProceedings.Authors = ToPeopleList(dto.Authors.Authors);
+                            inProceedingsElement.Authors = ConsolidateAuthorsWithDatabase(ToPeopleList(dto.Authors.Authors));
 
-                            submissions.Add(inProceedings);
+                            inProceedings.Add(inProceedingsElement);
                             break;
                         }
                 }
             }
-
-            return submissions;
         }
 
-        ICollection<Person> ToPeopleList(ICollection<AuthorJsonDto> authors) =>
+        private Issue? ConsolidateIssueWithDatabase(SubmissionJsonDto dto)
+        {
+            if (dto.PublicationTitle is null) return null;
+
+            var journal = journals.MatchingOrNew(new Journal(dto.PublicationTitle));
+            journals.Add(journal);
+
+            var issue = journal.Issues.MatchingOrNew(new Issue(dto.Volume, dto.PublicationNumber, month: null, journal));
+            issues.Add(issue);
+
+            return issue;
+        }
+
+        private ICollection<Person> ConsolidateAuthorsWithDatabase(ICollection<string> authorNames)
+        {
+            var authors = new List<Person>();
+
+            foreach (var authorName in authorNames)
+            {
+                var person = people.MatchingOrNew(new Person(authorName));
+                people.Add(person);
+
+                authors.Add(person);
+            }
+
+            return authors;
+        }
+
+        ICollection<string> ToPeopleList(ICollection<AuthorJsonDto> authors) =>
             authors
-                .Select(a => new Person(a.FullName))
+                .Select(a => a.FullName)
                 .ToList();
+
+        string? ToMonth(string? month)
+        {
+            if (month is null) return null;
+            return string.Join(", ", month.Split(new char[] { ' ', '-', '.' })
+                .Where(s => s.All(c => char.IsLetter(c))));
+        }
     }
 }

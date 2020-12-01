@@ -17,7 +17,7 @@ namespace IEIPaperSearch
             using (var scope = host.Services.CreateScope())
             {
                 var loader = scope.ServiceProvider.GetRequiredService<IDataLoaderService>();
-                loader.Test();
+                loader.LoadFromAllSources();
             }
 
             CreateDbIfNotExists(host);

@@ -10,7 +10,7 @@ namespace IEIPaperSearch.Models
         public string? StartPage { get; set; }
         public string? EndPage { get; set; }
 
-        public Issue PublishedIn { get; set; }
+        public Issue? PublishedIn { get; set; }
 
         private Article() : base()
         { }

@@ -11,6 +11,11 @@ namespace IEIPaperSearch.DataExtractors.BDLP
     {
         private readonly PaperSearchContext context;
 
+        private readonly List<Article> articles = new List<Article>();
+        private readonly List<Journal> journals = new List<Journal>();
+        private readonly List<Person> people = new List<Person>();
+        private readonly List<Issue> issues = new List<Issue>();
+
         public DblpDataExtractor(PaperSearchContext context)
         {
             this.context = context;
@@ -19,10 +24,11 @@ namespace IEIPaperSearch.DataExtractors.BDLP
         public ICollection<Article> Extract(string source)
         {
             var dtos = DeserializeJson(source);
-            return ToCanonicalModel(dtos);
+            ToCanonicalModel(dtos);
+            return articles;
         }
 
-        ICollection<ArticleJsonDto> DeserializeJson(string source)
+        static ICollection<ArticleJsonDto> DeserializeJson(string source)
         {
             var root = JObject.Parse(source);
 
@@ -32,10 +38,8 @@ namespace IEIPaperSearch.DataExtractors.BDLP
             return articleDtos;
         }
 
-        ICollection<Article> ToCanonicalModel(ICollection<ArticleJsonDto> dtos)
+        void ToCanonicalModel(ICollection<ArticleJsonDto> dtos)
         {
-            var articles = new List<Article>();
-
             foreach (var dto in dtos)
             {
                 var pages = ToPagePair(dto.Pages);
@@ -45,39 +49,36 @@ namespace IEIPaperSearch.DataExtractors.BDLP
                     dto.Year,
                     url: ToUrl(dto.Ee),
                     startPage: pages.Item1,
-                    endPage: pages.Item2);
-
-                article.Authors = ConsolidateAuthorsWithDatabase(
-                    article,
-                    (ICollection<string>)ToPeopleList(dto.Authors));
-                article.PublishedIn = ConsolidateIssueWithDatabase(article, dto);
+                    endPage: pages.Item2)
+                {
+                    Authors = ConsolidateAuthorsWithDatabase((ICollection<string>)ToPeopleList(dto.Authors)),
+                    PublishedIn = ConsolidateIssueWithDatabase(dto)
+                };
 
                 articles.Add(article);
             }
-
-            return articles;
         }
 
-        private Issue ConsolidateIssueWithDatabase(Article article, ArticleJsonDto dto)
+        private Issue ConsolidateIssueWithDatabase(ArticleJsonDto dto)
         {
-            var journal = context.Journals.FirstOrDefault(j => j.Name == dto.Journal) ?? new Journal(dto.Journal);
-            var issue = journal.Issues.MatchingOrNew(new Issue(dto.Volume, dto.Number, month: null, journal));
-            journal.Issues.Add(issue);
+            var journal = journals.MatchingOrNew(new Journal(dto.Journal));
+            journals.Add(journal);
 
-            issue.Articles.Add(article);
+            var issue = journal.Issues.MatchingOrNew(new Issue(dto.Volume, dto.Number, month: null, journal));
+            issues.Add(issue);
 
             return issue;
         }
 
-        private ICollection<Person> ConsolidateAuthorsWithDatabase(Article article, ICollection<string> authorNames)
+        private ICollection<Person> ConsolidateAuthorsWithDatabase(ICollection<string> authorNames)
         {
             var authors = new List<Person>();
 
             foreach (var authorName in authorNames)
             {
-                var person = context.People.MatchingOrNew(new Person(authorName));
+                var person = people.MatchingOrNew(new Person(authorName));
+                people.Add(person);
 
-                person.AuthorOf.Add(article);
                 authors.Add(person);
             }
 
@@ -86,7 +87,7 @@ namespace IEIPaperSearch.DataExtractors.BDLP
 
         string? ToUrl(dynamic? ee)
         {
-            var test = (ICollection<string>)ExtractContentList(ee);
+            var test = (ICollection<string>)ExtractContentList(ee, "$");
             return test.FirstOrDefault();
         }
 
@@ -132,7 +133,7 @@ namespace IEIPaperSearch.DataExtractors.BDLP
             throw new ArgumentException($"Property {property} has an unexpected shape.");
         }
 
-        (string?,string?) ToPagePair(string? pages)
+        static (string?,string?) ToPagePair(string? pages)
         {
             if (pages is null)
             {
@@ -143,9 +144,9 @@ namespace IEIPaperSearch.DataExtractors.BDLP
                 .Select(s => s.Trim())
                 .ToList();
 
-            return (tokens[0], tokens.Count() > 1 ? tokens[1] : null);
+            return (tokens[0], tokens.Count > 1 ? tokens[1] : null);
         }
 
-        ICollection<string> ToPeopleList(dynamic? authors) => ExtractContentList(authors);
+        ICollection<string> ToPeopleList(dynamic? authors) => ExtractContentList(authors, "$");
     }
 }
