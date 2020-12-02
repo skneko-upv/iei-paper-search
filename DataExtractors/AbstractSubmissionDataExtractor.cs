@@ -51,7 +51,7 @@ namespace IEIPaperSearch.DataExtractors
             var journal = context.Journals.MatchingOrNew(journals, new Journal(journalName));
             journals.Add(journal);
 
-            var issue = context.Issues.MatchingOrNew(journal.Issues, new Issue(volume, number, month, journal));
+            var issue = context.Issues.MatchingOrNew(issues, new Issue(volume, number, month, journal));
             issues.Add(issue);
 
             return issue;
