@@ -14,13 +14,13 @@ namespace IEIPaperSearch
         {
             var host = CreateHostBuilder(args).Build();
 
+            CreateDbIfNotExists(host);
+
             using (var scope = host.Services.CreateScope())
             {
                 var loader = scope.ServiceProvider.GetRequiredService<IDataLoaderService>();
-                loader.LoadFromAllSources();
+                loader.LoadFromIeeeXplore();
             }
-
-            CreateDbIfNotExists(host);
 
             host.Run();
         }
