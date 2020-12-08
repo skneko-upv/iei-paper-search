@@ -19,7 +19,7 @@ namespace IEIPaperSearch
             using (var scope = host.Services.CreateScope())
             {
                 var loader = scope.ServiceProvider.GetRequiredService<IDataLoaderService>();
-                loader.LoadFromIeeeXplore();
+                loader.LoadFromAllSources();
             }
 
             host.Run();

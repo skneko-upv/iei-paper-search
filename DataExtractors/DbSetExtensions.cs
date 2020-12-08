@@ -25,7 +25,7 @@ namespace IEIPaperSearch.DataExtractors
         public static T MatchingOrNew<T>(this DbSet<T> set, T reference)
             where T : class, IEquatable<T>
         {
-            var dbMatch = set.FirstOrDefault(e => e.Equals(reference));
+            var dbMatch = set.AsEnumerable().FirstOrDefault(e => e.Equals(reference));
             if (dbMatch is not null)
             {
                 return dbMatch;
