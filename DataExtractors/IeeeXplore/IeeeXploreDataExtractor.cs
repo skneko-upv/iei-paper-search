@@ -26,7 +26,6 @@ namespace IEIPaperSearch.DataExtractors.IeeeXplore
             {
                 switch (dto.ContentType)
                 {
-                    case "Early Access Articles":
                     case "Journals":
                         {
                             var article = new Article(
