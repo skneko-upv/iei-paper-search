@@ -6,10 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="DataSourceWrappers\**" />
-    <Content Remove="DataSourceWrappers\**" />
-    <EmbeddedResource Remove="DataSourceWrappers\**" />
-    <None Remove="DataSourceWrappers\**" />
+    <Compile Remove="DataSourceWrappers\DBLP\**" />
+    <Content Remove="DataSourceWrappers\DBLP\**" />
+    <EmbeddedResource Remove="DataSourceWrappers\DBLP\**" />
+    <None Remove="DataSourceWrappers\DBLP\**" />
   </ItemGroup>
 
   <ItemGroup>

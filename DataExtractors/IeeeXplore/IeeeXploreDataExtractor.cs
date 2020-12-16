@@ -63,6 +63,20 @@ namespace IEIPaperSearch.DataExtractors.IeeeXplore
                             inProceedings.Add(inProceedingsElement);
                             break;
                         }
+                    case "Books":
+                        {
+                            var book = new Book(
+                                dto.Title,
+                                dto.PublicationYear,
+                                dto.PdfUrl,
+                                dto.Publisher!)
+                            {
+                                Authors = MakeAuthors(ToAuthorsList(dto.Authors.Authors))
+                            };
+
+                            books.Add(book);
+                            break;
+                        }
                 }
             }
         }

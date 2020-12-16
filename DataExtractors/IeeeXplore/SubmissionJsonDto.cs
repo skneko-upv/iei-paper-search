@@ -41,5 +41,8 @@ namespace IEIPaperSearch.DataExtractors.IeeeXplore
 
         [JsonProperty("publication_date")]
         public string? PublicationDate { get; internal set; }
+
+        [JsonProperty("publisher")]
+        public string? Publisher { get; internal set; }
     }
 }
