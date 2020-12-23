@@ -1,9 +1,10 @@
 ﻿using IEIPaperSearch.DataExtractors;
 using IEIPaperSearch.DataExtractors.BDLP;
-using IEIPaperSearch.DataExtractors.Bibtex;
 using IEIPaperSearch.DataExtractors.IeeeXplore;
+using IEIPaperSearch.DataSourceWrappers.GoogleScholar;
 using IEIPaperSearch.DataSourceWrappers.IeeeXplore;
 using IEIPaperSearch.Persistence;
+using OpenQA.Selenium.Firefox;
 using System;
 using System.IO;
 
@@ -20,8 +21,8 @@ namespace IEIPaperSearch.Services.DataLoaders
 
         public void LoadFromAllSources()
         {
-            LoadFromDblp();
-            LoadFromIeeeXplore();
+            //LoadFromDblp();
+            //LoadFromIeeeXplore();
             LoadFromBibtex();
         }
 
@@ -41,9 +42,17 @@ namespace IEIPaperSearch.Services.DataLoaders
             ExtractFromJsonSource(new IeeeXploreDataExtractor(context), inProceedings);
         }
 
-        public void LoadFromBibtex() => ExtractFromJsonSource(
-            new BibtexDataExtractor(context),
-            File.ReadAllText(Environment.GetEnvironmentVariable("IEIPS_JSONSRC_BIBTEX")!));
+        public void LoadFromBibtex()
+        {
+            using var webDriver = new FirefoxDriver();
+            using var scrapper = new GoogleScholarSeleniumScrapper(webDriver, 1);
+            var scrapped = scrapper.Scrap("time travel");
+            Console.WriteLine(scrapped);
+
+            //ExtractFromJsonSource(
+            //    new BibtexDataExtractor(context),
+            //    File.ReadAllText(Environment.GetEnvironmentVariable("IEIPS_JSONSRC_BIBTEX")!));
+        }
 
         private void ExtractFromJsonSource(IJsonDataExtractor<SubmissionDataExtractorResult> extractor, string json)
         {
