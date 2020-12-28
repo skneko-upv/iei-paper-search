@@ -1,6 +1,7 @@
 ﻿using IEIPaperSearch.DataExtractors;
 using IEIPaperSearch.DataExtractors.BDLP;
 using IEIPaperSearch.DataExtractors.IeeeXplore;
+using IEIPaperSearch.DataSourceWrappers.DBLP;
 using IEIPaperSearch.DataSourceWrappers.GoogleScholar;
 using IEIPaperSearch.DataSourceWrappers.IeeeXplore;
 using IEIPaperSearch.Persistence;
@@ -21,14 +22,15 @@ namespace IEIPaperSearch.Services.DataLoaders
 
         public void LoadFromAllSources()
         {
-            //LoadFromDblp();
+            LoadFromDblp();
             //LoadFromIeeeXplore();
             //LoadFromGoogleScholar();
         }
 
-        public void LoadFromDblp() => ExtractFromJsonSource(
-            new DblpDataExtractor(context),
-            File.ReadAllText(Environment.GetEnvironmentVariable("IEIPS_JSONSRC_DBLP")!));
+        public void LoadFromDblp() =>
+            ExtractFromJsonSource(
+                new DblpDataExtractor(context, "#text"),
+                new DblpXmlConverterWrapper().ExtractFromXmlFile(@"C:\Users\Neko\Desktop\dblp.xml"));
 
         public void LoadFromIeeeXplore()
         {

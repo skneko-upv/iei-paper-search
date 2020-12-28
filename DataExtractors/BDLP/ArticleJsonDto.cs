@@ -7,7 +7,7 @@ namespace IEIPaperSearch.DataExtractors.BDLP
     internal class ArticleJsonDto
     {
         [JsonProperty("title")]
-        public string Title { get; internal set; }
+        public dynamic Title { get; internal set; }
 
         [JsonProperty("author")]
         public dynamic? Authors { get; internal set; }

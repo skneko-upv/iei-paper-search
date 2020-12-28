@@ -9,8 +9,12 @@ namespace IEIPaperSearch.DataExtractors.BDLP
 {
     internal class DblpDataExtractor : AbstractSubmissionDataExtractor<ArticleJsonDto>
     {
-        public DblpDataExtractor(PaperSearchContext context) : base(context)
-        { }
+        readonly string contentPropertyName;
+
+        public DblpDataExtractor(PaperSearchContext context, string contentPropertyName = "$") : base(context)
+        {
+            this.contentPropertyName = contentPropertyName;
+        }
 
         protected override ICollection<ArticleJsonDto> DeserializeJson(JObject root)
         {
@@ -27,7 +31,7 @@ namespace IEIPaperSearch.DataExtractors.BDLP
                 var pages = ToPagePair(dto.Pages);
 
                 var article = new Article(
-                    dto.Title,
+                    title: ToTitle(dto.Title),
                     dto.Year,
                     url: ToUrl(dto.Ee),
                     startPage: pages.Item1,
@@ -41,9 +45,15 @@ namespace IEIPaperSearch.DataExtractors.BDLP
             }
         }
 
-        private static string? ToUrl(dynamic? ee)
+        private string ToTitle(dynamic title)
         {
-            var test = (ICollection<string>)ExtractContentList(ee, "$");
+            var parts = (ICollection<string>)ExtractContentList(title, contentPropertyName);
+            return string.Join(" ", parts);
+        }
+
+        private string? ToUrl(dynamic? ee)
+        {
+            var test = (ICollection<string>)ExtractContentList(ee, contentPropertyName);
             return test.FirstOrDefault();
         }
 
@@ -61,9 +71,9 @@ namespace IEIPaperSearch.DataExtractors.BDLP
             return (tokens[0], tokens.Count > 1 ? tokens[1] : null);
         }
 
-        private ICollection<string> ToPeopleList(dynamic? authors) => ExtractContentList(authors, "$");
+        private ICollection<string> ToPeopleList(dynamic? authors) => ExtractContentList(authors, contentPropertyName);
 
-        private static ICollection<string> ExtractContentList(dynamic property, string contentPropertyName = "content")
+        private static ICollection<string> ExtractContentList(dynamic property, string contentPropertyName)
         {
             var list = new List<string>();
 
@@ -75,6 +85,13 @@ namespace IEIPaperSearch.DataExtractors.BDLP
             if (property is string)
             {
                 list.Add(property);
+                return list;
+            }
+
+            if (property is JObject && property[contentPropertyName] is JArray)
+            {
+                var parts = property[contentPropertyName];
+                foreach (var part in parts) { list.Add(part.Value); }
                 return list;
             }
 

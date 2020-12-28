@@ -6,13 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="DataSourceWrappers\DBLP\**" />
-    <Content Remove="DataSourceWrappers\DBLP\**" />
-    <EmbeddedResource Remove="DataSourceWrappers\DBLP\**" />
-    <None Remove="DataSourceWrappers\DBLP\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="Migrations\20201130182059_Test.cs" />
     <Compile Remove="Migrations\20201130182059_Test.Designer.cs" />
     <Compile Remove="Migrations\20201130191523_Test.cs" />
