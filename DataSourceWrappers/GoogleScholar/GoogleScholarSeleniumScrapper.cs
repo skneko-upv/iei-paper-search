@@ -21,7 +21,7 @@ namespace IEIPaperSearch.DataSourceWrappers.GoogleScholar
             this.driver = driver;
             this.pageLimit = pageLimit;
 
-            //driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(3);
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(500);
         }
 
         public IList<ScrapperResult> Scrap(string searchQuery)

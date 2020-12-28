@@ -7,7 +7,8 @@ using IEIPaperSearch.DataSourceWrappers.IeeeXplore;
 using IEIPaperSearch.Persistence;
 using OpenQA.Selenium.Firefox;
 using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace IEIPaperSearch.Services.DataLoaders
 {
@@ -22,34 +23,44 @@ namespace IEIPaperSearch.Services.DataLoaders
 
         public void LoadFromAllSources()
         {
-            LoadFromDblp();
+            //LoadFromDblp();
             //LoadFromIeeeXplore();
-            //LoadFromGoogleScholar();
+            LoadFromGoogleScholar();
         }
 
-        public void LoadFromDblp() =>
+        public void LoadFromDblp(string xml) =>
             ExtractFromJsonSource(
                 new DblpDataExtractor(context, "#text"),
-                new DblpXmlConverterWrapper().ExtractFromXmlFile(@"C:\Users\Neko\Desktop\dblp.xml"));
+                new DblpXmlConverterWrapper().ExtractFromXml(xml));
 
         public void LoadFromIeeeXplore()
         {
-            var articles = new IeeeXploreApiWrapper().ExtractFromApi(1000, IeeeXploreSubmissionKind.Articles).Result;
+            var wrapper = new IeeeXploreApiWrapper();
+
+            var articles = wrapper.ExtractFromApi(1000, IeeeXploreSubmissionKind.Articles).Result;
             ExtractFromJsonSource(new IeeeXploreDataExtractor(context), articles);
 
-            var books = new IeeeXploreApiWrapper().ExtractFromApi(1000, IeeeXploreSubmissionKind.Books).Result;
+            var books = wrapper.ExtractFromApi(1000, IeeeXploreSubmissionKind.Books).Result;
             ExtractFromJsonSource(new IeeeXploreDataExtractor(context), books);
 
-            var inProceedings = new IeeeXploreApiWrapper().ExtractFromApi(1000, IeeeXploreSubmissionKind.InProceedings).Result;
+            var inProceedings = wrapper.ExtractFromApi(1000, IeeeXploreSubmissionKind.InProceedings).Result;
             ExtractFromJsonSource(new IeeeXploreDataExtractor(context), inProceedings);
         }
 
         public void LoadFromGoogleScholar()
         {
-            using var webDriver = new FirefoxDriver();
-            using var scrapper = new GoogleScholarSeleniumScrapper(webDriver, 1);
-            var scrapped = scrapper.Scrap("time travel");
-            Console.WriteLine(scrapped);
+            ICollection<GoogleScholarSeleniumScrapper.ScrapperResult> scrapped;
+            using (var webDriver = new FirefoxDriver())
+            using (var scrapper = new GoogleScholarSeleniumScrapper(webDriver, 1))
+            {
+                scrapped = scrapper.Scrap("time travel");
+            }
+
+            var bibtex = scrapped
+                    .Where(e => e.Text is not null)
+                    .Select(e => e.Text!);
+            var json = new BibtexJsonConverter().BibtexToJson(bibtex);
+            Console.WriteLine(json);
 
             //ExtractFromJsonSource(
             //    new BibtexDataExtractor(context),

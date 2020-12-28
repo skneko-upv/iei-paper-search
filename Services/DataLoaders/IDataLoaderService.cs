@@ -4,7 +4,7 @@
     {
         public void LoadFromAllSources();
 
-        public void LoadFromDblp();
+        public void LoadFromDblp(string xml);
 
         public void LoadFromIeeeXplore();
 

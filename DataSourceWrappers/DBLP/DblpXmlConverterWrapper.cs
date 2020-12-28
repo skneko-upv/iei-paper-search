@@ -6,9 +6,8 @@ namespace IEIPaperSearch.DataSourceWrappers.DBLP
 {
     public class DblpXmlConverterWrapper
     {
-        public string ExtractFromXmlFile(string path)
+        public string ExtractFromXml(string xml)
         {
-            var xml = File.ReadAllText(path);
             var xdocument = new XmlDocument();
             xdocument.LoadXml(xml);
 
