@@ -29,7 +29,7 @@ namespace IEIPaperSearch.DataSourceWrappers.IeeeXplore
             }
         }
 
-        public async Task<string> ObtainArticlesOfType(int maxRecords, IeeeXploreSubmissionKind submissionKind)
+        public async Task<string> ExtractFromApi(int maxRecords, IeeeXploreSubmissionKind submissionKind)
         {
             var contentType = ContentTypeForSubmissionKind(submissionKind);
 

@@ -23,7 +23,7 @@ namespace IEIPaperSearch.Services.DataLoaders
         {
             //LoadFromDblp();
             //LoadFromIeeeXplore();
-            LoadFromBibtex();
+            //LoadFromGoogleScholar();
         }
 
         public void LoadFromDblp() => ExtractFromJsonSource(
@@ -32,17 +32,17 @@ namespace IEIPaperSearch.Services.DataLoaders
 
         public void LoadFromIeeeXplore()
         {
-            var articles = new IeeeXploreApiWrapper().ObtainArticlesOfType(1000, IeeeXploreSubmissionKind.Articles).Result;
+            var articles = new IeeeXploreApiWrapper().ExtractFromApi(1000, IeeeXploreSubmissionKind.Articles).Result;
             ExtractFromJsonSource(new IeeeXploreDataExtractor(context), articles);
 
-            var books = new IeeeXploreApiWrapper().ObtainArticlesOfType(1000, IeeeXploreSubmissionKind.Books).Result;
+            var books = new IeeeXploreApiWrapper().ExtractFromApi(1000, IeeeXploreSubmissionKind.Books).Result;
             ExtractFromJsonSource(new IeeeXploreDataExtractor(context), books);
 
-            var inProceedings = new IeeeXploreApiWrapper().ObtainArticlesOfType(1000, IeeeXploreSubmissionKind.InProceedings).Result;
+            var inProceedings = new IeeeXploreApiWrapper().ExtractFromApi(1000, IeeeXploreSubmissionKind.InProceedings).Result;
             ExtractFromJsonSource(new IeeeXploreDataExtractor(context), inProceedings);
         }
 
-        public void LoadFromBibtex()
+        public void LoadFromGoogleScholar()
         {
             using var webDriver = new FirefoxDriver();
             using var scrapper = new GoogleScholarSeleniumScrapper(webDriver, 1);

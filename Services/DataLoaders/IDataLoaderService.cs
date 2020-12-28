@@ -8,6 +8,6 @@
 
         public void LoadFromIeeeXplore();
 
-        public void LoadFromBibtex();
+        public void LoadFromGoogleScholar();
     }
 }
