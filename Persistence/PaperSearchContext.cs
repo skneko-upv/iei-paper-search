@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IEIPaperSearch.Persistence
 {
-    internal class PaperSearchContext : DbContext
+    public class PaperSearchContext : DbContext
     {
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public PaperSearchContext(DbContextOptions<PaperSearchContext> options) : base(options)
