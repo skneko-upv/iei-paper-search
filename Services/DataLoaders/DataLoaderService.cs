@@ -1,11 +1,12 @@
 ﻿using IEIPaperSearch.DataExtractors;
 using IEIPaperSearch.DataExtractors.BDLP;
+using IEIPaperSearch.DataExtractors.Bibtex;
 using IEIPaperSearch.DataExtractors.IeeeXplore;
 using IEIPaperSearch.DataSourceWrappers.DBLP;
 using IEIPaperSearch.DataSourceWrappers.GoogleScholar;
 using IEIPaperSearch.DataSourceWrappers.IeeeXplore;
 using IEIPaperSearch.Persistence;
-using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Edge;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace IEIPaperSearch.Services.DataLoaders
         {
             //LoadFromDblp();
             //LoadFromIeeeXplore();
-            LoadFromGoogleScholar();
+            //LoadFromGoogleScholar();
         }
 
         public void LoadFromDblp(string xml) =>
@@ -50,7 +51,7 @@ namespace IEIPaperSearch.Services.DataLoaders
         public void LoadFromGoogleScholar()
         {
             ICollection<GoogleScholarSeleniumScrapper.ScrapperResult> scrapped;
-            using (var webDriver = new FirefoxDriver())
+            using (var webDriver = new EdgeDriver())
             using (var scrapper = new GoogleScholarSeleniumScrapper(webDriver, 1))
             {
                 scrapped = scrapper.Scrap("time travel");

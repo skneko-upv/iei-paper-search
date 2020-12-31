@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web;
 
 namespace IEIPaperSearch.DataSourceWrappers.GoogleScholar
@@ -21,7 +22,7 @@ namespace IEIPaperSearch.DataSourceWrappers.GoogleScholar
             this.driver = driver;
             this.pageLimit = pageLimit;
 
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(500);
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
         }
 
         public IList<ScrapperResult> Scrap(string searchQuery)
@@ -77,6 +78,8 @@ namespace IEIPaperSearch.DataSourceWrappers.GoogleScholar
 
         public void HandleCiteModal(string? url)
         {
+            Thread.Sleep(500);
+
             var bibtexButton = driver.FindElements(By.ClassName("gs_citi"))
                 .First(e => e.Text == GOOGLE_SCHOLAR_BIBTEX_TEXT);
             results.Add(new ScrapperResult(url, bibtexButton.GetProperty("href")));
@@ -95,7 +98,7 @@ namespace IEIPaperSearch.DataSourceWrappers.GoogleScholar
             { }
         }
 
-        public void Dispose() => driver.Close();
+        public void Dispose() => driver.Quit();
 
         public class ScrapperResult
         {
