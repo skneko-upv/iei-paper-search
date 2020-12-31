@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System.IO;
 using System.Xml;
 
 namespace IEIPaperSearch.DataSourceWrappers.DBLP
