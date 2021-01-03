@@ -26,7 +26,7 @@ namespace IEIPaperSearch.Services.DataLoaders
         {
             //LoadFromDblp();
             //LoadFromIeeeXplore();
-            LoadFromGoogleScholar();
+            //LoadFromGoogleScholar();
         }
 
         public void LoadFromDblp(string xml) =>
