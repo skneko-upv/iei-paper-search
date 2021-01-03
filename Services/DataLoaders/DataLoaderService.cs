@@ -61,11 +61,8 @@ namespace IEIPaperSearch.Services.DataLoaders
                     .Where(e => e.Text is not null)
                     .Select(e => e.Text!);
             var json = new BibtexJsonConverter().BibtexToJson(bibtex);
-            Console.WriteLine(json);
 
-            //ExtractFromJsonSource(
-            //    new BibtexDataExtractor(context),
-            //    File.ReadAllText(Environment.GetEnvironmentVariable("IEIPS_JSONSRC_BIBTEX")!));
+            ExtractFromJsonSource(new BibtexDataExtractor(context), json);
         }
 
         private void ExtractFromJsonSource(IJsonDataExtractor<SubmissionDataExtractorResult> extractor, string json)

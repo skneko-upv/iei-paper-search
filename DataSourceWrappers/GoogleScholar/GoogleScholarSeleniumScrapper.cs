@@ -17,6 +17,8 @@ namespace IEIPaperSearch.DataSourceWrappers.GoogleScholar
         readonly int pageLimit;
         readonly IList<ScrapperResult> results = new List<ScrapperResult>();
 
+        readonly Random rng = new Random();
+
         public GoogleScholarSeleniumScrapper(IWebDriver driver, int pageLimit = DEFAULT_PAGE_LIMIT)
         {
             this.driver = driver;
@@ -78,7 +80,7 @@ namespace IEIPaperSearch.DataSourceWrappers.GoogleScholar
 
         public void HandleCiteModal(string? url)
         {
-            Thread.Sleep(500);
+            Thread.Sleep(rng.Next(2500, 4000));
 
             var bibtexButton = driver.FindElements(By.ClassName("gs_citi"))
                 .First(e => e.Text == GOOGLE_SCHOLAR_BIBTEX_TEXT);
@@ -91,6 +93,7 @@ namespace IEIPaperSearch.DataSourceWrappers.GoogleScholar
         {
             try
             {
+                Thread.Sleep(rng.Next(1200, 2600));
                 var text = driver.FindElement(By.TagName("pre")).Text;
                 result.Text = text;
             } 
