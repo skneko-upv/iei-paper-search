@@ -1,9 +1,53 @@
 ﻿@page
 @model IEIPaperSearch.Pages.SearchModel
 @{
-    ViewData["Title"] = "Búsqueda";
+    ViewData["Title"] = "Motor de búsqueda bibiliográfica";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1>Búsqueda bibliográfica IEI</h1>
+<br>
 
-<p>sdsafdsadadafasdadasd</p>
+<h4> Buscar referencias por:</h4>
+<br>
+
+<form>
+    <table style="width:40%">
+
+        <tr>
+            Autor: &nbsp;&nbsp;
+            <input id="author" />
+        </tr>
+        <div><br></div>
+        <tr>
+            Titulo: &nbsp;&nbsp;
+            <input id="title" />
+        </tr>
+        <div><br></div>
+        <tr>
+            Año: &nbsp;&nbsp; desde &nbsp;
+            <input id="year_from" />&nbsp;
+            hasta &nbsp;
+            <input id="year_to" />
+        </tr>
+        <div><br></div>
+        <tr>
+            <td>Tipo de publicación:</td>
+            <td>
+                <input type="checkbox" id="article_box" />
+                <label> &nbsp;artículo</label>
+                <br>
+                <input type="checkbox" id="book_box" />
+                <label> &nbsp;libro</label>
+                <br>
+                <input type="checkbox" id="congress_box" />
+                <label> &nbsp;comunicacion en congreso</label>
+                <br>
+            </td>
+        </tr>
+    </table><br>
+    <div>
+        <input type="submit" value="Enviar" />&nbsp;&nbsp;
+        <input type="reset" value="Limpiar" />
+    </div>
+</form>
+<br>

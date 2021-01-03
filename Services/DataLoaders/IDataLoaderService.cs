@@ -1,6 +1,6 @@
 ﻿namespace IEIPaperSearch.Services.DataLoaders
 {
-    internal interface IDataLoaderService
+    public interface IDataLoaderService
     {
         public void LoadFromAllSources();
 
