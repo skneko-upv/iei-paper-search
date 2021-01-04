@@ -9,36 +9,50 @@
 <h4> Seleccionar parámetros de carga: </h4>
 <br>
 
-<form>
+<script>
+    function resetForm() {
+        document.getElementById("form").reset();
+    }
+</script>
+
+<form id="form" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
     <table style="width:40%">
         <tr>
             <td>Fuente de datos:</td>
             <td>
-                <input type="checkbox" id="article_box" />
+                <input type="checkbox" id="article_box" asp-for="LoadFromDblp" />
                 <label> &nbsp;DBLP</label>
                 <br>
-                <input type="checkbox" id="book_box" />
+                <input type="checkbox" id="book_box" asp-for="LoadFromIeeeXplore" />
                 <label> &nbsp;IEEE Xplore</label>
                 <br>
-                <input type="checkbox" id="congress_box" />
+                <input type="checkbox" id="congress_box" asp-for="LoadFromGoogleScholar" />
                 <label> &nbsp;Google Scholar</label>
                 <br>
             </td>
         </tr>
     </table><br>
     <table>
-                <tr>
-                    <td>
-                        Año: &nbsp;&nbsp; desde &nbsp;
-                        <input id="year_from" />&nbsp;
-                        hasta &nbsp;
-                        <input id="year_to" />
-                    </td>
-                </tr>
-            </table>
-    <div> <br><br>
-        <input type="submit" value="Cargar" />&nbsp;&nbsp;
-        <input type="reset" value="Cancelar" />
+        <tr>
+            <td>
+                Año: &nbsp;&nbsp; desde &nbsp;
+                <input id="year_from" asp-for="StartingYear" value="1990" />&nbsp;
+                hasta &nbsp;
+                <input id="year_to" asp-for="EndYear" value="2020" />
+                <span asp-validation-for="StartingYear" class="text-danger"></span>
+                <span asp-validation-for="EndYear" class="text-danger"></span>
+            </td>
+        </tr>
+    </table>
+    <div>
+        <br><br>
+        <input asp-page-handler="Submit" type="submit" value="Cargar" class="btn btn-primary" />&nbsp;&nbsp;
+        <input type="reset" value="Limpiar" class="btn" onclick="resetForm()" />
     </div>
 </form>
 <br>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
