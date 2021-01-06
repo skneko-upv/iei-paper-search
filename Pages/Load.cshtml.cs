@@ -38,7 +38,10 @@ namespace IEIPaperSearch.Pages
         [GreaterThanOrEqualTo("StartingYear", ErrorMessage = "El año de final debe ser mayor o igual que el año de inicio.")]
         public uint EndYear { get; set; }
 
-        public async Task<IActionResult> OnPostSubmit()
+        [BindProperty]
+        public bool FormLocked { get; set; }
+
+        public async Task<IActionResult> OnPostAsync()
         {
             Console.WriteLine("Form sent");
 
@@ -52,13 +55,29 @@ namespace IEIPaperSearch.Pages
                 return Page();
             }
 
-            return Page();
+            FormLocked = true;
 
-            loaderService.LoadFromIeeeXplore();
+            await LoadFromSelectedSources();
 
             TempData["test"] = 3;
 
             return RedirectToPage("/LoadResults");
+        }
+
+        async Task LoadFromSelectedSources()
+        {
+            if (LoadFromDblp)
+            {
+                loaderService.LoadFromDblp();
+            }
+            if (LoadFromIeeeXplore)
+            {
+                loaderService.LoadFromIeeeXplore();
+            }
+            if (LoadFromGoogleScholar)
+            {
+                loaderService.LoadFromGoogleScholar();
+            }
         }
     }
 }
