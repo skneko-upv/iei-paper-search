@@ -48,7 +48,7 @@
     </table>
     <div>
         <br><br>
-        <input @(Model.FormLocked ? "disabled" : "") asp-page-handler="Submit" type="submit" value="Cargar" class="btn btn-primary" />&nbsp;&nbsp;
+        <input @(Model.FormLocked ? "disabled" : "") type="submit" value="Cargar" class="btn btn-primary" />&nbsp;&nbsp;
         <input @(Model.FormLocked ? "disabled" : "") type="reset" value="Limpiar" class="btn" onclick="resetForm()" />
     </div>
 

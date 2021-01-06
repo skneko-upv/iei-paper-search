@@ -1,53 +1,97 @@
 ﻿@page
 @model IEIPaperSearch.Pages.SearchModel
 @{
-    ViewData["Title"] = "Motor de búsqueda bibiliográfica";
+    ViewData["Title"] = "Búsqueda bibliográfica";
 }
 
-<h1>Búsqueda bibliográfica IEI</h1>
+<h1>@ViewData["Title"]</h1>
 <br>
 
 <h4> Buscar referencias por:</h4>
 <br>
 
-<form>
-    <table style="width:40%">
+<script>
+    function resetForm() {
+        document.getElementById("form").reset();
+    }
+</script>
 
+<form id="form" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <table style="width:40%">
         <tr>
             Autor: &nbsp;&nbsp;
-            <input id="author" />
+            <input id="author" asp-for="Author" />
+            <span asp-validation-for="Author" class="text-danger"></span>
         </tr>
         <div><br></div>
         <tr>
             Titulo: &nbsp;&nbsp;
-            <input id="title" />
+            <input id="title" asp-for="Title" />
+            <span asp-validation-for="Title" class="text-danger"></span>
         </tr>
         <div><br></div>
         <tr>
             Año: &nbsp;&nbsp; desde &nbsp;
-            <input id="year_from" />&nbsp;
+            <input id="year_from" asp-for="StartingYear" />&nbsp;
             hasta &nbsp;
-            <input id="year_to" />
+            <input id="year_to" asp-for="EndYear" />
+            <span asp-validation-for="StartingYear" class="text-danger"></span>
+            <span asp-validation-for="EndYear" class="text-danger"></span>
         </tr>
         <div><br></div>
         <tr>
             <td>Tipo de publicación:</td>
             <td>
-                <input type="checkbox" id="article_box" />
+                <input type="checkbox" id="article_box" asp-for="FindArticles" />
                 <label> &nbsp;artículo</label>
                 <br>
-                <input type="checkbox" id="book_box" />
+                <input type="checkbox" id="book_box" asp-for="FindBooks" />
                 <label> &nbsp;libro</label>
                 <br>
-                <input type="checkbox" id="congress_box" />
-                <label> &nbsp;comunicacion en congreso</label>
+                <input type="checkbox" id="congress_box" asp-for="FindInProceedings" />
+                <label> &nbsp;comunicación en congreso</label>
                 <br>
             </td>
         </tr>
     </table><br>
     <div>
-        <input type="submit" value="Enviar" />&nbsp;&nbsp;
-        <input type="reset" value="Limpiar" />
+        <input @(Model.FormLocked ? "disabled" : "") type="submit" value="Buscar" class="btn btn-primary" />&nbsp;&nbsp;
+        <input @(Model.FormLocked ? "disabled" : "") type="reset" value="Limpiar" class="btn" onclick="resetForm()" />
+    </div>
+
+    <div id="form-locked-modal" class="modal @(Model.FormLocked ? "" : "hidden")">
+        <div class="modal-content">Cargando... Por favor, espere...</div>
     </div>
 </form>
 <br>
+
+<style>
+    /* The Modal (background) */
+    .modal {
+        display: initial;
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content/Box */
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 50%; /* Could be more or less, depending on screen size */
+    }
+
+    .hidden {
+        visibility: hidden;
+    }
+</style>
+

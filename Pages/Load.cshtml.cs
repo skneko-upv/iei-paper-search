@@ -43,8 +43,6 @@ namespace IEIPaperSearch.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
-            Console.WriteLine("Form sent");
-
             if (!LoadFromDblp && !LoadFromIeeeXplore && !LoadFromGoogleScholar)
             {
                 ModelState.AddModelError("", "Selecciona al menos una fuente.");

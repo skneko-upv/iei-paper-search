@@ -19,5 +19,8 @@
             StartPage = startPage;
             EndPage = endPage;
         }
+
+        public override string ToString() =>
+            $"InPr {base.ToString()}; pp. {StartPage}-{EndPage}, {Conference} {Edition}";
     }
 }

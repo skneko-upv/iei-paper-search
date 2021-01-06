@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace IEIPaperSearch.Models
 {
@@ -28,5 +29,8 @@ namespace IEIPaperSearch.Models
 
         public bool Equals([AllowNull] Submission other)
             => (other != null) && (other.Title == Title) && (other.Year == Year);
+
+        public override string ToString() =>
+            $"{string.Join(",", Authors)} - {Title} ({Year}) - {URL}";
     }
 }

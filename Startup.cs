@@ -1,5 +1,6 @@
 using IEIPaperSearch.Persistence;
 using IEIPaperSearch.Services.DataLoaders;
+using IEIPaperSearch.Services.Search;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,7 @@ namespace IEIPaperSearch
                 options.UseSqlServer(Configuration.GetConnectionString("PaperSearchContext")));
 
             services.AddTransient<IDataLoaderService, DataLoaderService>();
+            services.AddTransient<ISearchService, SearchService>();
 
             services.AddRazorPages();
         }

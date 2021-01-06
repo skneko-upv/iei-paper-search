@@ -13,5 +13,8 @@
         {
             Publisher = publisher;
         }
+
+        public override string ToString() =>
+            $"Book {base.ToString()}; {Publisher}";
     }
 }

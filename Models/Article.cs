@@ -26,5 +26,8 @@ namespace IEIPaperSearch.Models
         }
 
         public bool Equals([AllowNull] Article other) => base.Equals(other);
+
+        public override string ToString() =>
+            $"Arti {base.ToString()}; pp. {StartPage}~{EndPage}, {PublishedIn}";
     }
 }
