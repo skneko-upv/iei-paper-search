@@ -35,10 +35,7 @@ namespace IEIPaperSearch.Controllers
         /// <param name="findArticles">Set to true to include articles.</param>
         /// <param name="findBooks">Set to true to include books.</param>
         /// <param name="findInProceedings">Set to true to include conference proceedings.</param>
-        /// <response code="200">
-        /// A collection of all submissions matching the search criteria, or an empty collection if no result
-        /// was found.
-        /// </response>
+        /// <response code="200">A collection of all submissions matching the search criteria, or an empty collection if no result was found.</response>
         /// <response code="400">If the search query or conditions are invalid.</response>
         [HttpGet("search")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -87,7 +84,7 @@ namespace IEIPaperSearch.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult LoadFromExternalSources(uint startingYear, uint endYear, bool useDblp, bool useIeeeXplore, bool useGoogleScholar)
+        public ActionResult<IDataLoaderService.DataLoaderResult> LoadFromExternalSources(uint startingYear, uint endYear, bool useDblp, bool useIeeeXplore, bool useGoogleScholar)
         {
             if (!useDblp && !useIeeeXplore && !useGoogleScholar)
             {
@@ -98,19 +95,20 @@ namespace IEIPaperSearch.Controllers
                 return BadRequest("End year cannot be before starting year.");
             }
 
+            var result = new IDataLoaderService.DataLoaderResult(0);
             try
             {
                 if (useDblp)
                 {
-                    loaderService.LoadFromDblp();
+                    result += loaderService.LoadFromDblp();
                 }
                 if (useIeeeXplore)
                 {
-                    loaderService.LoadFromIeeeXplore();
+                    result += loaderService.LoadFromIeeeXplore();
                 }
                 if (useGoogleScholar)
                 {
-                    loaderService.LoadFromGoogleScholar();
+                    result += loaderService.LoadFromGoogleScholar();
                 }
             }
             catch (Exception)
@@ -119,7 +117,7 @@ namespace IEIPaperSearch.Controllers
                 throw;  // Return 500 Internal Error
             }
 
-            return Ok();
+            return Ok(result);
         }
     }
 }

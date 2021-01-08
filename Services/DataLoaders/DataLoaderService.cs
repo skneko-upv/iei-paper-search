@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using static IEIPaperSearch.Services.DataLoaders.IDataLoaderService;
 
 namespace IEIPaperSearch.Services.DataLoaders
 {
@@ -23,14 +24,7 @@ namespace IEIPaperSearch.Services.DataLoaders
             this.context = context;
         }
 
-        public void LoadFromAllSources()
-        {
-            //LoadFromDblp();
-            //LoadFromIeeeXplore();
-            //LoadFromGoogleScholar();
-        }
-
-        public void LoadFromDblp()
+        public DataLoaderResult LoadFromDblp()
         {
             Console.WriteLine("Started DBLP data extraction...");
 
@@ -42,14 +36,16 @@ namespace IEIPaperSearch.Services.DataLoaders
             var xml = File.ReadAllText(path);
 
             Console.WriteLine("Inserting DBLP data into database...");
-            ExtractFromJsonSource(
+            var count = ExtractFromJsonSource(
                 new DblpDataExtractor(context, "#text"),
                 new DblpXmlConverterWrapper().ExtractFromXml(xml));
 
             Console.WriteLine("done extracting DBLP data.");
+
+            return new DataLoaderResult(count);
         }
 
-        public void LoadFromIeeeXplore()
+        public DataLoaderResult LoadFromIeeeXplore()
         {
             Console.WriteLine("Started IEEE Xplore data extraction...");
 
@@ -61,16 +57,18 @@ namespace IEIPaperSearch.Services.DataLoaders
 
             Console.WriteLine("Inserting IEEE Xplore books data into database (2/3)...");
             var books = wrapper.ExtractFromApi(1000, IeeeXploreSubmissionKind.Books).Result;
-            ExtractFromJsonSource(new IeeeXploreDataExtractor(context), books);
+            var count = ExtractFromJsonSource(new IeeeXploreDataExtractor(context), books);
 
             Console.WriteLine("Inserting IEEE Xplore inproceedings data into database (3/3)...");
             var inProceedings = wrapper.ExtractFromApi(1000, IeeeXploreSubmissionKind.InProceedings).Result;
             ExtractFromJsonSource(new IeeeXploreDataExtractor(context), inProceedings);
 
             Console.WriteLine("done extracting IEEE Xplore data.");
+
+            return new DataLoaderResult(count);
         }
 
-        public void LoadFromGoogleScholar()
+        public DataLoaderResult LoadFromGoogleScholar()
         {
             Console.WriteLine("Started Google Scholar data extraction...");
 
@@ -88,19 +86,29 @@ namespace IEIPaperSearch.Services.DataLoaders
             var json = new BibtexJsonConverter().BibtexToJson(bibtex);
 
             Console.WriteLine("Inserting Google Scholar data into database...");
-            ExtractFromJsonSource(new BibtexDataExtractor(context), json);
+            var count = ExtractFromJsonSource(new BibtexDataExtractor(context), json);
 
             Console.WriteLine("done extracting Google Scholar data.");
+
+            return new DataLoaderResult(count);
         }
 
-        private void ExtractFromJsonSource(IJsonDataExtractor<SubmissionDataExtractorResult> extractor, string json)
+        private int ExtractFromJsonSource(IJsonDataExtractor<SubmissionDataExtractorResult> extractor, string json)
         {
             var data = extractor.Extract(json);
-
+            var count = 0;
+            
             context.Books.AddRange(data.Books);
+            count += data.Books.Count;
+            
             context.Articles.AddRange(data.Articles);
+            count += data.Articles.Count;
+            
             context.InProceedings.AddRange(data.InProceedings);
+            count += data.InProceedings.Count;
+
             context.SaveChanges();
+            return count;
         }
     }
 }
