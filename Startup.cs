@@ -29,6 +29,14 @@ namespace IEIPaperSearch
             services.AddTransient<ISearchService, SearchService>();
 
             services.AddRazorPages();
+
+            services.AddControllers();
+
+            services.AddOpenApiDocument(config =>
+            {
+                config.Title = "IEIPaperSearch";
+                config.Version = "0.1.0";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,7 +63,11 @@ namespace IEIPaperSearch
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                endpoints.MapControllers();
             });
+
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
         }
     }
 }
