@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace IEIPaperSearch.Models
 {
+    /// <summary>
+    /// Someone who can author or have some role over a submission.
+    /// </summary>
     public class Person : IEquatable<Person>
     {
         public int Id { get; private set; }
