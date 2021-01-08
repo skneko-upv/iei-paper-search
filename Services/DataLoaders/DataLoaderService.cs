@@ -40,7 +40,7 @@ namespace IEIPaperSearch.Services.DataLoaders
                 new DblpDataExtractor(context, "#text"),
                 new DblpXmlConverterWrapper().ExtractFromXml(xml));
 
-            Console.WriteLine("done extracting DBLP data.");
+            Console.WriteLine($"done extracting DBLP data ({count} entries).");
 
             return new DataLoaderResult(count);
         }
@@ -63,7 +63,7 @@ namespace IEIPaperSearch.Services.DataLoaders
             var inProceedings = wrapper.ExtractFromApi(1000, IeeeXploreSubmissionKind.InProceedings).Result;
             ExtractFromJsonSource(new IeeeXploreDataExtractor(context), inProceedings);
 
-            Console.WriteLine("done extracting IEEE Xplore data.");
+            Console.WriteLine($"done extracting IEEE Xplore data ({count} entries).");
 
             return new DataLoaderResult(count);
         }
@@ -88,7 +88,7 @@ namespace IEIPaperSearch.Services.DataLoaders
             Console.WriteLine("Inserting Google Scholar data into database...");
             var count = ExtractFromJsonSource(new BibtexDataExtractor(context), json);
 
-            Console.WriteLine("done extracting Google Scholar data.");
+            Console.WriteLine($"done extracting Google Scholar data ({count} entries).");
 
             return new DataLoaderResult(count);
         }
