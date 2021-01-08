@@ -36,6 +36,7 @@ namespace IEIPaperSearch
             {
                 config.Title = "IEIPaperSearch";
                 config.Version = "0.1.0";
+                config.GenerateXmlObjects = true;
             });
         }
 
