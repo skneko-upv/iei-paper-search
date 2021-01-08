@@ -1,5 +1,4 @@
 using IEIPaperSearch.Persistence;
-using IEIPaperSearch.Services.DataLoaders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,12 +14,6 @@ namespace IEIPaperSearch
             var host = CreateHostBuilder(args).Build();
 
             CreateDbIfNotExists(host);
-
-            using (var scope = host.Services.CreateScope())
-            {
-                var loader = scope.ServiceProvider.GetRequiredService<IDataLoaderService>();
-                loader.LoadFromAllSources();
-            }
 
             host.Run();
         }
