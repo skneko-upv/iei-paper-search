@@ -32,5 +32,9 @@ namespace IEIPaperSearch.Models
 
         public override string ToString() =>
             $"{string.Join(",", Authors)} - {Title} ({Year}) - {URL}";
+
+        public override bool Equals(object? obj) => Equals(obj as Submission);
+
+        public override int GetHashCode() => HashCode.Combine(Id, Title, Year);
     }
 }
