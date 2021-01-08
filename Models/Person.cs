@@ -34,7 +34,7 @@ namespace IEIPaperSearch.Models
         }
 
         public bool Equals([AllowNull] Person other)
-            => (other != null) && ($"{other.Name} {other.Surnames}" == $"{Name} {Surnames}");
+            => (other != null) && other.Name == Name && other.Surnames == Surnames;
 
         public override string ToString() => $"{Name[0]}. {Surnames}";
     }

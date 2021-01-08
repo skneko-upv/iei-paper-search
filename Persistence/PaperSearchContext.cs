@@ -18,7 +18,12 @@ namespace IEIPaperSearch.Persistence
         public DbSet<Issue> Issues { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        { }
+        {
+            optionsBuilder.UseSqlServer(options =>
+            {
+                options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            });
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
