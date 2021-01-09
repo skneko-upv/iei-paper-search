@@ -53,7 +53,7 @@ namespace IEIPaperSearch.Pages
                 ModelState.AddModelError("", "Introduzca algún término de búsqueda.");
             }
 
-            if (!FindBooks && !FindBooks && !FindInProceedings)
+            if (!FindArticles && !FindBooks && !FindInProceedings)
             {
                 ModelState.AddModelError("", "Seleccione al menos un tipo de publicación a buscar.");
             }
@@ -66,10 +66,7 @@ namespace IEIPaperSearch.Pages
             FormLocked = true;
 
             var results = searchService.Search(Title, Author, (int?)StartingYear, (int?)EndYear, FindArticles, FindBooks, FindInProceedings);
-            foreach (var result in results)
-            {
-                Console.WriteLine(result);
-            }
+            TempData.Put<IEnumerable<Submission>>("SearchResults", results);
 
             return RedirectToPage("/SearchResults");
         }

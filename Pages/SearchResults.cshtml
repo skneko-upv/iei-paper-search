@@ -1,36 +1,51 @@
 ﻿@page
-@model IEIPaperSearch.Pages.Articles.IndexModel
+@model IEIPaperSearch.Pages.SearchResultsModel
 
 @{
     ViewData["Title"] = "Resultados de búsqueda";
 }
 
-<h1>Index</h1>
+<h1>@ViewData["Title"]</h1>
 
-<span>Encontrados @Model.Results.Count resultados</span>
+<span>Encontrados @Model.Results.Count resultados</span> 
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => /* miembro del modelo */)
+                @Html.DisplayNameFor(model => model.Results.First().Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Results.First().Year)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Results.First().URL)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Results.First().Authors)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Results)
+         @foreach (var item in Model.Results)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Propiedad1)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Propiedad2)
-                </td>
-                <td>
-                    <a asp-page="./TIPO/Details" asp-route-id="@item.Id">Detalles</a>
-                </td>
-            </tr>
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Year)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.URL)
+            </td>
+            <td>
+                @string.Join(", ", item.Authors)
+            </td>
+            <td>
+                <a asp-page="./TIPO/Details" asp-route-id="@item.Id">Detalles</a>
+            </td>
+        </tr>
         }
     </tbody>
 </table>

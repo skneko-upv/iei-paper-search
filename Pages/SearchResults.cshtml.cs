@@ -10,11 +10,14 @@ namespace IEIPaperSearch.Pages
 {
     public class SearchResultsModel : PageModel
     {
+        
+
         [BindProperty(SupportsGet = true)]
         public ICollection<Submission> Results { get; set; }
 
         public void OnGet()
         {
+            Results = (ICollection<Submission>)TempData.Get<List<dynamic>>("SearchResults")!;
             // Coger resultados -> Results
             //  Aquí:
             //TempData.Get<ICollection<Submission>>("SearchResults");

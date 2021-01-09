@@ -12,7 +12,10 @@ namespace IEIPaperSearch.Pages
         public static void Put<T>(this ITempDataDictionary tempData, string key, T value)
             where T : class
         {
-            tempData[key] = JsonConvert.SerializeObject(value);
+            tempData[key] = JsonConvert.SerializeObject(value, Formatting.None, new JsonSerializerSettings
+            {
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects
+            });
         }
 
         public static T? Get<T>(this ITempDataDictionary tempData, string key)
@@ -20,7 +23,10 @@ namespace IEIPaperSearch.Pages
         {
             object? o;
             tempData.TryGetValue(key, out o);
-            return o is null ? default : JsonConvert.DeserializeObject<T>((string)o);
+            return o is null ? default : JsonConvert.DeserializeObject<T>((string)o, new JsonSerializerSettings
+            {
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects
+            });
         }
     }
 }
