@@ -26,7 +26,7 @@ namespace IEIPaperSearch.Services.DataLoaders
         /// <summary>
         /// An aggregation of diagnostic data of a data loading procedure.
         /// </summary>
-        public struct DataLoaderResult
+        public class DataLoaderResult
         {
             public int InsertedSubmissionCount { get; }
             public ICollection<string> Errors { get; }

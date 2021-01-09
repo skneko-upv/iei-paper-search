@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using IEIPaperSearch.Services.DataLoaders;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using static IEIPaperSearch.Services.DataLoaders.IDataLoaderService;
 
 namespace IEIPaperSearch.Pages
 {
@@ -57,25 +58,48 @@ namespace IEIPaperSearch.Pages
 
             await LoadFromSelectedSources();
 
-            TempData["test"] = 3;
-
             return RedirectToPage("/LoadResults");
         }
 
-        async Task LoadFromSelectedSources()
+        Task LoadFromSelectedSources()
         {
-            if (LoadFromDblp)
+            return Task.Run(() =>
             {
-                loaderService.LoadFromDblp();
-            }
-            if (LoadFromIeeeXplore)
+                if (LoadFromDblp)
+                {
+                    TempData.Put<DataLoaderResult>("LoadResults.Dblp", 
+                        ExtractFromOneSource(loaderService.LoadFromDblp, "DBLP"));
+                }
+                if (LoadFromIeeeXplore)
+                {
+                    TempData.Put<DataLoaderResult>("LoadResults.IeeeXplore", 
+                        ExtractFromOneSource(loaderService.LoadFromIeeeXplore, "IEEE Xplore"));
+                }
+                if (LoadFromGoogleScholar)
+                {
+                    TempData.Put<DataLoaderResult>("LoadResults.GoogleScholar", 
+                        ExtractFromOneSource(loaderService.LoadFromGoogleScholar, "Google Scholar"));
+                }
+            });
+        }
+
+        delegate DataLoaderResult ExtractionFunction();
+
+        DataLoaderResult ExtractFromOneSource(ExtractionFunction extract, string errorDiscriminator)
+        {
+            DataLoaderResult result = new DataLoaderResult(0);
+            var errors = new List<string>();
+            try
             {
-                loaderService.LoadFromIeeeXplore();
+                result = extract();
             }
-            if (LoadFromGoogleScholar)
+            catch (Exception e)
             {
-                loaderService.LoadFromGoogleScholar();
+                errors.Add($"El extractor {errorDiscriminator} ha fallado: {e.Message}");
             }
+
+            result.AddAllErrors(errors);
+            return result;
         }
     }
 }

@@ -10,23 +10,23 @@
 <p> Número de referencias cargadas: </p>
 <br>
 <dl>
-    <dd>DBLP: &nbsp;</dd>
-    <dd>IEEE Xplore: &nbsp;</dd>
-    <dd>Google Scholar: &nbsp;</dd>
+    <dd>DBLP: @Model.DblpCount&nbsp;</dd>
+    <dd>IEEE Xplore: @Model.IeeeXploreCount&nbsp;</dd>
+    <dd>Google Scholar: @Model.GoogleScholarCount&nbsp;</dd>
     <br>
 
-    <dd>Total de referencias cargadas:  &nbsp;</dd>
+    <dd>Total de referencias cargadas: @Model.CombinedCount &nbsp;</dd>
 </dl>
 
 
 
 <br>
 <br>
-<label>Errores en el proceso: &nbsp;</label>
+<label>Errores en el proceso: @Model.ErrorCount&nbsp;</label>
 <br >
 
-<label>Lista de errores:</label>
-
+<label>Lista de errores:</label><br />
+@Model.ErrorList
 
 <br>
 <br>
