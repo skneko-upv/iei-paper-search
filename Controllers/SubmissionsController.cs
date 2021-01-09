@@ -72,8 +72,7 @@ namespace IEIPaperSearch.Controllers
         }
 
         /// <summary>
-        /// Extract data from known external sources and insert it into the local persistent storage, filtered by publication
-        /// year.
+        /// Extract data from known external sources and insert it into the local persistent storage.
         /// </summary>
         /// <remarks>
         /// This procedure will normalize, consolidate and deduplicate data from the different diverging schemes of each
@@ -84,8 +83,6 @@ namespace IEIPaperSearch.Controllers
         /// this operation will silently skip errors and may finish successfully after having partially or totally ignored some 
         /// of the selected sources. The caller is advised to examine the resulting error log.
         /// </remarks>
-        /// <param name="startingYear">The minimum (inclusive) publication year to include.</param>
-        /// <param name="endYear">The maximum (inclusive) publication year to include.</param>
         /// <param name="useDblp">Set to true to include submissions from DBLP static XML data.</param>
         /// <param name="useIeeeXplore">Set to true to include submissions from the IEEE Xplore REST API.</param>
         /// <param name="useGoogleScholar">Set to true to include submissions scraped from the Google Scholar website.</param>
@@ -96,15 +93,11 @@ namespace IEIPaperSearch.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<IDataLoaderService.DataLoaderResult> LoadFromExternalSources(uint startingYear, uint endYear, bool useDblp, bool useIeeeXplore, bool useGoogleScholar)
+        public ActionResult<IDataLoaderService.DataLoaderResult> LoadFromExternalSources(bool useDblp, bool useIeeeXplore, bool useGoogleScholar)
         {
             if (!useDblp && !useIeeeXplore && !useGoogleScholar)
             {
                 return BadRequest("At least one external source must be selected.");
-            }
-            if (endYear < startingYear)
-            {
-                return BadRequest("End year cannot be before starting year.");
             }
 
             var result = new IDataLoaderService.DataLoaderResult(0);
