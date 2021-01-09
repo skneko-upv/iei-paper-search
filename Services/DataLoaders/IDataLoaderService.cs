@@ -37,6 +37,14 @@ namespace IEIPaperSearch.Services.DataLoaders
                 Errors = errors is null ? new HashSet<string>() : errors.ToHashSet();
             }
 
+            public void AddAllErrors(IEnumerable<string> errors)
+            {
+                foreach (var error in errors)
+                {
+                    Errors.Add(error);
+                }
+            }
+
             public static DataLoaderResult operator +(DataLoaderResult a, DataLoaderResult b) =>
                 new DataLoaderResult(
                     a.InsertedSubmissionCount + b.InsertedSubmissionCount,

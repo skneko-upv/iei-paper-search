@@ -40,7 +40,7 @@ namespace IEIPaperSearch.Controllers
         [HttpGet("search")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<IEnumerable<Submission>> Search(string? author, string? title, uint? startingYear, uint? endYear, bool findArticles, bool findBooks, bool findInProceedings)
+        public ActionResult<IEnumerable<dynamic>> Search(string? author, string? title, uint? startingYear, uint? endYear, bool findArticles, bool findBooks, bool findInProceedings)
         {
             if (author is null && title is null)
             {
@@ -54,8 +54,20 @@ namespace IEIPaperSearch.Controllers
             {
                 return BadRequest("End year cannot be before starting year.");
             }
+            
+            // Use dynamic capabilities of the language in order to return a list of mixed kinds of submissions, such that the serialization into JSON
+            // produces objects of different shape and length according to its runtime type.
+            var results = new List<dynamic>();
+            foreach (var result in searchService.Search(title, author, (int?)startingYear, (int?)endYear, findArticles, findBooks, findInProceedings))
+            {
+                switch (result)
+                {
+                    case Article article: results.Add(article); break;
+                    case Book book: results.Add(book); break;
+                    case InProceedings inProceedings: results.Add(inProceedings); break;
+                }
+            }
 
-            var results = searchService.Search(title, author, (int?)startingYear, (int?)endYear, findArticles, findBooks, findInProceedings);
             return Ok(results);
         }
 
@@ -96,27 +108,44 @@ namespace IEIPaperSearch.Controllers
             }
 
             var result = new IDataLoaderService.DataLoaderResult(0);
-            try
+            var errors = new List<string>();
+            if (useDblp)
             {
-                if (useDblp)
+                try
                 {
                     result += loaderService.LoadFromDblp();
                 }
-                if (useIeeeXplore)
+                catch (Exception e)
+                {
+                    errors.Add($"DBLP extraction stopped: {e.Message}");
+                }
+            }
+
+            if (useIeeeXplore)
+            {
+                try
                 {
                     result += loaderService.LoadFromIeeeXplore();
                 }
-                if (useGoogleScholar)
+                catch (Exception e)
+                {
+                    errors.Add($"IEEE Xplore extraction stopped: {e.Message}");
+                }
+            }
+
+            if (useGoogleScholar)
+            {
+                try
                 {
                     result += loaderService.LoadFromGoogleScholar();
                 }
-            }
-            catch (Exception)
-            {
-                // TODO
-                throw;  // Return 500 Internal Error
+                catch (Exception e)
+                {
+                    errors.Add($"Google Scholar extraction stopped: {e.Message}");
+                }
             }
 
+            result.AddAllErrors(errors);
             return Ok(result);
         }
     }
