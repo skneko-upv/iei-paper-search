@@ -14,7 +14,8 @@ namespace IEIPaperSearch.Pages
         {
             tempData[key] = JsonConvert.SerializeObject(value, Formatting.None, new JsonSerializerSettings
             {
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects
+                PreserveReferencesHandling = PreserveReferencesHandling.All,
+                TypeNameHandling = TypeNameHandling.Objects,
             });
         }
 
@@ -25,7 +26,8 @@ namespace IEIPaperSearch.Pages
             tempData.TryGetValue(key, out o);
             return o is null ? default : JsonConvert.DeserializeObject<T>((string)o, new JsonSerializerSettings
             {
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects
+                PreserveReferencesHandling = PreserveReferencesHandling.All,
+                TypeNameHandling = TypeNameHandling.Objects,
             });
         }
     }

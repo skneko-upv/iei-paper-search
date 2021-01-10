@@ -12,13 +12,6 @@ namespace IEIPaperSearch.Pages
 {
     public class SearchModel : PageModel
     {
-        readonly ISearchService searchService;
-
-        public SearchModel(ISearchService searchService)
-        {
-            this.searchService = searchService;
-        }
-
         [BindProperty]
         public string? Author { get; set; }
 
@@ -65,10 +58,14 @@ namespace IEIPaperSearch.Pages
 
             FormLocked = true;
 
-            var results = searchService.Search(Title, Author, (int?)StartingYear, (int?)EndYear, FindArticles, FindBooks, FindInProceedings);
-            TempData.Put<IEnumerable<Submission>>("SearchResults", results);
-
-            return RedirectToPage("/SearchResults");
+            return RedirectToPage("/SearchResults", new { 
+                title = Title, 
+                author = Author, 
+                startingYear = StartingYear, 
+                endYear = EndYear, 
+                findArticles = FindArticles, 
+                findBooks = FindBooks, 
+                findInProceedings = FindInProceedings });
         }
     }
 }

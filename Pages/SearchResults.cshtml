@@ -18,9 +18,6 @@
                 @Html.DisplayNameFor(model => model.Results.First().Year)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Results.First().URL)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Results.First().Authors)
             </th>
             <th></th>
@@ -37,13 +34,10 @@
                 @Html.DisplayFor(modelItem => item.Year)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.URL)
-            </td>
-            <td>
                 @string.Join(", ", item.Authors)
             </td>
             <td>
-                <a asp-page="./TIPO/Details" asp-route-id="@item.Id">Detalles</a>
+                <a href="@item.URL">Leer en línea</a>
             </td>
         </tr>
         }

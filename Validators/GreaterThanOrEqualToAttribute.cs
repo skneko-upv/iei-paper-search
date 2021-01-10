@@ -44,7 +44,17 @@ namespace IEIPaperSearch.Pages
 
         bool IsComparableWithProperty(PropertyInfo? propertyInfo, params Type[] typeArguments)
         {
-            return typeof(IComparable<>).MakeGenericType(typeArguments).IsAssignableFrom(propertyInfo?.PropertyType);
+            var targetType = propertyInfo?.PropertyType;
+            if (targetType is null)
+            {
+                return false;
+            }
+
+            if (Nullable.GetUnderlyingType(targetType) != null)
+            {
+                targetType = targetType.GenericTypeArguments[0];
+            }
+            return typeof(IComparable<>).MakeGenericType(typeArguments).IsAssignableFrom(targetType);
         }
     }
 }
