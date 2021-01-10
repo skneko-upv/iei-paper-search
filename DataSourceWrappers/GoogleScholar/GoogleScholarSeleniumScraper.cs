@@ -7,7 +7,7 @@ using System.Web;
 
 namespace IEIPaperSearch.DataSourceWrappers.GoogleScholar
 {
-    public sealed class GoogleScholarSeleniumScrapper : IDisposable
+    public sealed class GoogleScholarSeleniumScraper : IDisposable
     {
         const int DEFAULT_PAGE_LIMIT = 10;
         static readonly string GOOGLE_SCHOLAR_URL_BASE = "https://scholar.google.com/";
@@ -19,7 +19,7 @@ namespace IEIPaperSearch.DataSourceWrappers.GoogleScholar
 
         readonly Random rng = new Random();
 
-        public GoogleScholarSeleniumScrapper(IWebDriver driver, int pageLimit = DEFAULT_PAGE_LIMIT)
+        public GoogleScholarSeleniumScraper(IWebDriver driver, int pageLimit = DEFAULT_PAGE_LIMIT)
         {
             this.driver = driver;
             this.pageLimit = pageLimit;

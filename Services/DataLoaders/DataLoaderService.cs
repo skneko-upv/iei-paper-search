@@ -75,9 +75,9 @@ namespace IEIPaperSearch.Services.DataLoaders
         {
             Console.WriteLine("Started Google Scholar data extraction...");
 
-            ICollection<GoogleScholarSeleniumScrapper.ScrapperResult> scrapped;
+            ICollection<GoogleScholarSeleniumScraper.ScrapperResult> scrapped;
             using (var webDriver = new EdgeDriver())
-            using (var scrapper = new GoogleScholarSeleniumScrapper(webDriver, GSCHLOAR_PAGE_LIMIT))
+            using (var scrapper = new GoogleScholarSeleniumScraper(webDriver, GSCHLOAR_PAGE_LIMIT))
             {
                 scrapped = scrapper.Scrap(query);
             }
