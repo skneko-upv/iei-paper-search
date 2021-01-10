@@ -46,16 +46,34 @@ namespace IEIPaperSearch.DataSourceWrappers.GoogleScholar
                     HandleCiteModal(url);
                 }
 
+                IWebElement nextPageButton;
                 try {
-                    var nextPageButton = driver.FindElement(
+                    nextPageButton = driver.FindElement(
                         By.CssSelector(".gs_btnPR .gs_in_ib .gs_btn_lrge .gs_btn_half .gs_btn_lsu"));
-                    nextPageButton.Click();
-                    page += 1;
                 }
                 catch (NoSuchElementException)
                 {
                     break;
                 }
+
+                try
+                {
+                    nextPageButton = driver.FindElement(By.Id("gs_n"))
+                        .FindElement(By.TagName("center"))
+                        .FindElement(By.TagName("table"))
+                        .FindElement(By.TagName("tbody"))
+                        .FindElement(By.TagName("tr"))
+                        .FindElements(By.TagName("td"))
+                        .Last()
+                        .FindElement(By.TagName("a"));
+                }
+                catch (NoSuchElementException)
+                {
+                    break;
+                }
+
+                nextPageButton.Click();
+                page += 1;
             }
 
             foreach (var result in results)
