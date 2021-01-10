@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace IEIPaperSearch.Models
 {
@@ -52,6 +51,6 @@ namespace IEIPaperSearch.Models
 
         public override bool Equals(object? obj) => Equals(obj as Submission);
 
-        public override int GetHashCode() => HashCode.Combine(Id, Title, Year);
+        public override int GetHashCode() => HashCode.Combine(Title, Year);
     }
 }
