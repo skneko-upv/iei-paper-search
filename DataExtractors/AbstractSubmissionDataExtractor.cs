@@ -20,6 +20,7 @@ namespace IEIPaperSearch.DataExtractors
         public AbstractSubmissionDataExtractor(PaperSearchContext context)
         {
             this.context = context;
+            people.UnionWith(context.People);
         }
 
         public SubmissionDataExtractorResult Extract(string source)
