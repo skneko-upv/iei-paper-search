@@ -23,19 +23,25 @@ namespace IEIPaperSearch.Services.Search
             {
                 articles.UnionWith(SearchByType<DbSet<Article>, Article>(context.Articles, title, author, startingYear, endYear)
                     .Include("Authors")
+                    .Include("PublishedIn")
+                    .Include(e => ((Article)e).PublishedIn.Journal)
                     .ToHashSet());
             }
 
             ISet<Submission> books = new HashSet<Submission>();
             if (findBooks)
             {
-                books.UnionWith(SearchByType<DbSet<Book>, Book>(context.Books, title, author, startingYear, endYear).ToHashSet());
+                books.UnionWith(SearchByType<DbSet<Book>, Book>(context.Books, title, author, startingYear, endYear)
+                    .Include("Authors")
+                    .ToHashSet());
             }
 
             ISet<Submission> inProceedings = new HashSet<Submission>();
             if (findInProceedings)
             {
-                inProceedings.UnionWith(SearchByType<DbSet<InProceedings>, InProceedings>(context.InProceedings, title, author, startingYear, endYear).ToHashSet());
+                inProceedings.UnionWith(SearchByType<DbSet<InProceedings>, InProceedings>(context.InProceedings, title, author, startingYear, endYear)
+                    .Include("Authors")
+                    .ToHashSet());
             }
 
             return articles.Union(books).Union(inProceedings);

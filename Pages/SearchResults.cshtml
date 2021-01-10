@@ -12,15 +12,24 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Results.First().Title)
+                Título
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Results.First().Year)
+                Año
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Results.First().Authors)
+                Autores
             </th>
-            <th></th>
+            <th>
+                Página inicio
+            </th>
+            <th>
+                Página fin
+            </th>
+            <th>
+                Revista/Editorial/Conferencia
+            </th>
+            <th style="width: 15%"></th>
         </tr>
     </thead>
     <tbody>
@@ -37,9 +46,50 @@
                 @string.Join(", ", item.Authors)
             </td>
             <td>
+                @(item is Models.Article ? (Html.DisplayFor(modelItem => (item as Models.Article)!.StartPage)) : "")
+                @(item is Models.InProceedings ? (Html.DisplayFor(modelItem => (item as Models.InProceedings)!.StartPage)) : "")
+            </td>
+            <td>
+                @(item is Models.Article ? (Html.DisplayFor(modelItem => (item as Models.Article)!.EndPage)) : "")
+                @(item is Models.InProceedings ? (Html.DisplayFor(modelItem => (item as Models.InProceedings)!.EndPage)) : "")
+            </td>
+            <td>
+                @(GetIssueAndJournalSummary(item))
+                @(item is Models.Book ? (Html.DisplayFor(modelItem => (item as Models.Book)!.Publisher)) : "")
+                @(GetConferenceSummary(item))
+            </td>
+            <td>
                 <a href="@item.URL">Leer en línea</a>
             </td>
         </tr>
         }
     </tbody>
 </table>
+
+@functions{
+    string GetIssueAndJournalSummary(Models.Submission article)
+    {
+        if (article is Models.Article)
+        {
+            var issue = (article as Models.Article)!.PublishedIn;
+            if (issue is null)
+            {
+                return "";
+            }
+
+            return $"{issue.Journal.Name} {issue.Number ?? ""} {issue.Volume ?? ""} {issue.Month ?? ""}";
+        }
+        return "";
+    }
+
+    string GetConferenceSummary(Models.Submission inProceedings)
+    {
+        if (inProceedings is Models.InProceedings)
+        {
+            var item = (inProceedings as Models.InProceedings)!;
+
+            return $"{item.Conference} {item.Edition ?? ""}";
+        }
+        return "";
+    }
+}
