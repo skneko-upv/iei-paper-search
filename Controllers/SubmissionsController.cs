@@ -86,6 +86,7 @@ namespace IEIPaperSearch.Controllers
         /// <param name="useDblp">Set to true to include submissions from DBLP static XML data.</param>
         /// <param name="useIeeeXplore">Set to true to include submissions from the IEEE Xplore REST API.</param>
         /// <param name="useGoogleScholar">Set to true to include submissions scraped from the Google Scholar website.</param>
+        /// <param name="googleScholarQuery">The query to use in order to scrap the Google Scholar website. Required if Google Scholar has been selected, and useless otherwise.</param>
         /// <response code="200">If the operation has finished. A set of diagnostic data is returned, including the error log.</response>
         /// <response code="400">If the input parameters are invalid.</response>
         /// <response code="500">If a critical error has prevented the operation from finishing.</response>
@@ -93,11 +94,16 @@ namespace IEIPaperSearch.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<IDataLoaderService.DataLoaderResult> LoadFromExternalSources(bool useDblp, bool useIeeeXplore, bool useGoogleScholar)
+        public ActionResult<IDataLoaderService.DataLoaderResult> LoadFromExternalSources(bool useDblp, bool useIeeeXplore, bool useGoogleScholar, string? googleScholarQuery)
         {
             if (!useDblp && !useIeeeXplore && !useGoogleScholar)
             {
                 return BadRequest("At least one external source must be selected.");
+            }
+
+            if (useGoogleScholar && string.IsNullOrWhiteSpace(googleScholarQuery))
+            {
+                return BadRequest("You must introduce a Google Scholar query because you have selected to use Google Scholar.");
             }
 
             var result = new IDataLoaderService.DataLoaderResult(0);
@@ -130,7 +136,7 @@ namespace IEIPaperSearch.Controllers
             {
                 try
                 {
-                    result += loaderService.LoadFromGoogleScholar();
+                    result += loaderService.LoadFromGoogleScholar(googleScholarQuery!);
                 }
                 catch (Exception e)
                 {

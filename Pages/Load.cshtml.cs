@@ -32,6 +32,9 @@ namespace IEIPaperSearch.Pages
         public bool LoadFromGoogleScholar { get; set; }
 
         [BindProperty]
+        public string? GoogleScholarQuery { get; set; }
+
+        [BindProperty]
         [Range(1000,3000)]
         public uint StartingYear { get; set; }
         [BindProperty]
@@ -47,6 +50,11 @@ namespace IEIPaperSearch.Pages
             if (!LoadFromDblp && !LoadFromIeeeXplore && !LoadFromGoogleScholar)
             {
                 ModelState.AddModelError("", "Selecciona al menos una fuente.");
+            }
+
+            if (LoadFromGoogleScholar && string.IsNullOrWhiteSpace(GoogleScholarQuery))
+            {
+                ModelState.AddModelError("", "Como has seleccionado Google Scholar, debes introducir una consulta.");
             }
 
             if (!ModelState.IsValid)
@@ -78,7 +86,7 @@ namespace IEIPaperSearch.Pages
                 if (LoadFromGoogleScholar)
                 {
                     TempData.Put<DataLoaderResult>("LoadResults.GoogleScholar", 
-                        ExtractFromOneSource(loaderService.LoadFromGoogleScholar, "Google Scholar"));
+                        ExtractFromOneSource(() => loaderService.LoadFromGoogleScholar(GoogleScholarQuery!), "Google Scholar"));
                 }
             });
         }

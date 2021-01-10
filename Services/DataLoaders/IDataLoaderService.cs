@@ -21,7 +21,7 @@ namespace IEIPaperSearch.Services.DataLoaders
         /// Load scraped data from the Google Scholar website into the local persistent storage.
         /// </summary>
         /// <returns>The number of new submissions added.</returns>
-        public DataLoaderResult LoadFromGoogleScholar();
+        public DataLoaderResult LoadFromGoogleScholar(string query);
 
         /// <summary>
         /// An aggregation of diagnostic data of a data loading procedure.

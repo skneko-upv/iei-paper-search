@@ -19,6 +19,9 @@ namespace IEIPaperSearch.Services.DataLoaders
     {
         private readonly PaperSearchContext context;
 
+        const int IEEE_XPLORE_LIMIT_PER_TYPE = 1000;
+        const int GSCHLOAR_PAGE_LIMIT = 10;
+
         public DataLoaderService(PaperSearchContext context)
         {
             this.context = context;
@@ -52,15 +55,15 @@ namespace IEIPaperSearch.Services.DataLoaders
             var wrapper = new IeeeXploreApiWrapper();
 
             Console.WriteLine("Inserting IEEE Xplore articles data into database (1/3)...");
-            var articles = wrapper.ExtractFromApi(1000, IeeeXploreSubmissionKind.Articles).Result;
+            var articles = wrapper.ExtractFromApi(IEEE_XPLORE_LIMIT_PER_TYPE, IeeeXploreSubmissionKind.Articles).Result;
             ExtractFromJsonSource(new IeeeXploreDataExtractor(context), articles);
 
             Console.WriteLine("Inserting IEEE Xplore books data into database (2/3)...");
-            var books = wrapper.ExtractFromApi(1000, IeeeXploreSubmissionKind.Books).Result;
+            var books = wrapper.ExtractFromApi(IEEE_XPLORE_LIMIT_PER_TYPE, IeeeXploreSubmissionKind.Books).Result;
             var count = ExtractFromJsonSource(new IeeeXploreDataExtractor(context), books);
 
             Console.WriteLine("Inserting IEEE Xplore inproceedings data into database (3/3)...");
-            var inProceedings = wrapper.ExtractFromApi(1000, IeeeXploreSubmissionKind.InProceedings).Result;
+            var inProceedings = wrapper.ExtractFromApi(IEEE_XPLORE_LIMIT_PER_TYPE, IeeeXploreSubmissionKind.InProceedings).Result;
             ExtractFromJsonSource(new IeeeXploreDataExtractor(context), inProceedings);
 
             Console.WriteLine($"done extracting IEEE Xplore data ({count} entries).");
@@ -68,15 +71,15 @@ namespace IEIPaperSearch.Services.DataLoaders
             return new DataLoaderResult(count);
         }
 
-        public DataLoaderResult LoadFromGoogleScholar()
+        public DataLoaderResult LoadFromGoogleScholar(string query)
         {
             Console.WriteLine("Started Google Scholar data extraction...");
 
             ICollection<GoogleScholarSeleniumScrapper.ScrapperResult> scrapped;
             using (var webDriver = new EdgeDriver())
-            using (var scrapper = new GoogleScholarSeleniumScrapper(webDriver, 1))
+            using (var scrapper = new GoogleScholarSeleniumScrapper(webDriver, GSCHLOAR_PAGE_LIMIT))
             {
-                scrapped = scrapper.Scrap("time travel");
+                scrapped = scrapper.Scrap(query);
             }
 
             Console.WriteLine("Coverting Google Scholar Bibtex data to JSON...");
