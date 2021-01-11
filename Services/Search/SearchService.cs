@@ -24,7 +24,7 @@ namespace IEIPaperSearch.Services.Search
                 articles.UnionWith(SearchByType<DbSet<Article>, Article>(context.Articles, title, author, startingYear, endYear)
                     .Include("Authors")
                     .Include("PublishedIn")
-                    .Include(e => ((Article)e).PublishedIn.Journal)
+                    .Include(e => ((Article)e).PublishedIn!.Journal)
                     .ToHashSet());
             }
 
