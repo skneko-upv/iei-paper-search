@@ -6,7 +6,11 @@ using IEIPaperSearch.DataSourceWrappers.DBLP;
 using IEIPaperSearch.DataSourceWrappers.GoogleScholar;
 using IEIPaperSearch.DataSourceWrappers.IeeeXplore;
 using IEIPaperSearch.Persistence;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
+using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.IE;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,6 +25,11 @@ namespace IEIPaperSearch.Services.DataLoaders
 
         const int IEEE_XPLORE_LIMIT_PER_TYPE = 1000;
         const int GSCHLOAR_PAGE_LIMIT = 10;
+
+        const string SELENIUM_WEBDRIVER_CHROME = "chrome";
+        const string SELENIUM_WEBDRIVER_EDGE = "edge";
+        const string SELENIUM_WEBDRIVER_IE = "ie";
+        const string SELENIUM_WEBDRIVER_GECKO = "gecko";
 
         public DataLoaderService(PaperSearchContext context)
         {
@@ -75,8 +84,18 @@ namespace IEIPaperSearch.Services.DataLoaders
         {
             Console.WriteLine("Started Google Scholar data extraction...");
 
+            var desiredWebDriver = Environment.GetEnvironmentVariable("IEI_SELENIUM_WEBDRIVER")?.ToLower();
+            IWebDriver webDriver = desiredWebDriver switch
+            {
+                SELENIUM_WEBDRIVER_CHROME => new ChromeDriver(),
+                SELENIUM_WEBDRIVER_EDGE => new EdgeDriver(),
+                SELENIUM_WEBDRIVER_IE => new InternetExplorerDriver(),
+                SELENIUM_WEBDRIVER_GECKO => new FirefoxDriver(),
+                _ => throw new InvalidElementStateException("No WebDriver for Selenium has been configured."),
+            };
+
             ICollection<GoogleScholarSeleniumScraper.ScrapperResult> scrapped;
-            using (var webDriver = new EdgeDriver())
+            using (webDriver)
             using (var scrapper = new GoogleScholarSeleniumScraper(webDriver, GSCHLOAR_PAGE_LIMIT))
             {
                 scrapped = scrapper.Scrap(query);
