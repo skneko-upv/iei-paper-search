@@ -1,3 +1,4 @@
+using AutoMapper;
 using IEIPaperSearch.Persistence;
 using IEIPaperSearch.Services.DataLoaders;
 using IEIPaperSearch.Services.Search;
@@ -7,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace IEIPaperSearch
 {
@@ -24,6 +26,8 @@ namespace IEIPaperSearch
         {
             services.AddDbContext<PaperSearchContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("PaperSearchContext")));
+
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddTransient<IDataLoaderService, DataLoaderService>();
             services.AddTransient<ISearchService, SearchService>();
