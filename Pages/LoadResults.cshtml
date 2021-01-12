@@ -25,8 +25,13 @@
 <label>Errores en el proceso: @Model.ErrorCount&nbsp;</label>
 <br >
 
-<label>Lista de errores:</label><br />
-@Model.ErrorList
+<label>Lista de errores:</label>
+<ul>
+    @foreach (var error in @Model.ErrorList) { 
+        <li>@error</li>
+    }
+</ul>
+
 
 <br>
 <br>

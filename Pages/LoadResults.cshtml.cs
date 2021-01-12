@@ -33,7 +33,7 @@ namespace IEIPaperSearch.Pages
         public int ErrorCount { get; set; }
         
         [BindProperty(SupportsGet = true)]
-        public string ErrorList { get; set; }
+        public ICollection<string> ErrorList { get; set; }
 
         public void OnGet()
         {
@@ -62,7 +62,7 @@ namespace IEIPaperSearch.Pages
 
             ErrorCount = combinedResult.Errors.Count;
 
-            ErrorList = string.Join("\n", combinedResult.Errors);
+            ErrorList = combinedResult.Errors;
         }
     }
 }
