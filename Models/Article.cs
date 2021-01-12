@@ -15,14 +15,12 @@ namespace IEIPaperSearch.Models
         /// The page of the journal this article was published in, in which this
         /// article starts.
         /// </summary>
-        [Display(Name = "Start Page")]
         public string? StartPage { get; set; }
 
         /// <summary>
         /// The page of the journal this article was published in, in which this
         /// article ends.
         /// </summary>
-        [Display(Name = "End Page")]
         public string? EndPage { get; set; }
 
         /// <summary>

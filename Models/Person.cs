@@ -12,7 +12,14 @@ namespace IEIPaperSearch.Models
     {
         public int Id { get; private set; }
 
+        /// <summary>
+        /// The name of this person up to the first space.
+        /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// The tail of the name of this person.
+        /// </summary>
         public string Surnames { get; set; }
 
         public ICollection<Submission> AuthorOf { get; set; } = new HashSet<Submission>();
