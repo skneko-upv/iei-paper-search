@@ -88,5 +88,12 @@ namespace IEIPaperSearch.DataExtractors
             Books = books;
             InProceedings = inProceedings;
         }
+
+        public void Deconstruct(out ICollection<Article> articles, out ICollection<Book> books, out ICollection<InProceedings> inProceedings)
+        {
+            articles = Articles;
+            books = Books;
+            inProceedings = InProceedings;
+        }
     }
 }

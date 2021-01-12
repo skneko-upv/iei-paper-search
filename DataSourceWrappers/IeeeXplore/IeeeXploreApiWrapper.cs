@@ -29,11 +29,19 @@ namespace IEIPaperSearch.DataSourceWrappers.IeeeXplore
             }
         }
 
-        public async Task<string> ExtractFromApi(int maxRecords, IeeeXploreSubmissionKind submissionKind)
+        public async Task<string> ExtractFromApi(int maxRecords, IeeeXploreSubmissionKind submissionKind, int? startYear, int? endYear)
         {
             var contentType = ContentTypeForSubmissionKind(submissionKind);
 
             var query = $"?apikey={apiKey}&format=json&max_records={maxRecords}&content_type={contentType}";
+            if (startYear is not null)
+            {
+                query += $"&start_year={startYear}";
+            }
+            if (endYear is not null)
+            {
+                query += $"&end_year={endYear}";
+            }
 
             var response = await client.GetAsync(query);
 

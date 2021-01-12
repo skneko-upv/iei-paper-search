@@ -27,11 +27,11 @@ namespace IEIPaperSearch.DataSourceWrappers.GoogleScholar
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
         }
 
-        public IList<ScrapperResult> Scrap(string searchQuery)
+        public IList<ScrapperResult> Scrap(int? startYear, int? endYear, string? searchQuery)
         {
             results.Clear();
 
-            SearchSettingUrl(searchQuery);
+            SearchSettingUrl(startYear, endYear, searchQuery);
 
             var page = 1;
             while (page <= pageLimit)
@@ -56,20 +56,23 @@ namespace IEIPaperSearch.DataSourceWrappers.GoogleScholar
                     break;
                 }
 
-                try
+                if (nextPageButton is null)
                 {
-                    nextPageButton = driver.FindElement(By.Id("gs_n"))
-                        .FindElement(By.TagName("center"))
-                        .FindElement(By.TagName("table"))
-                        .FindElement(By.TagName("tbody"))
-                        .FindElement(By.TagName("tr"))
-                        .FindElements(By.TagName("td"))
-                        .Last()
-                        .FindElement(By.TagName("a"));
-                }
-                catch (NoSuchElementException)
-                {
-                    break;
+                    try
+                    {
+                        nextPageButton = driver.FindElement(By.Id("gs_n"))
+                            .FindElement(By.TagName("center"))
+                            .FindElement(By.TagName("table"))
+                            .FindElement(By.TagName("tbody"))
+                            .FindElement(By.TagName("tr"))
+                            .FindElements(By.TagName("td"))
+                            .Last()
+                            .FindElement(By.TagName("a"));
+                    }
+                    catch (NoSuchElementException)
+                    {
+                        break;
+                    }
                 }
 
                 nextPageButton.Click();
@@ -85,12 +88,23 @@ namespace IEIPaperSearch.DataSourceWrappers.GoogleScholar
             return results.Where(r => r.Text is not null).ToList();
         }
 
-        public void SearchSettingUrl(string query)
+        public void SearchSettingUrl(int? startYear, int? endYear, string? searchQuery)
         {
+            var query = $"?q={HttpUtility.UrlEncode(searchQuery)}";
+
+            if (startYear is not null)
+            {
+                query += $"&as_ylo={startYear}";
+            }
+            if (endYear is not null)
+            {
+                query += $"&as_yhi={endYear}";
+            }
+
             var uri = new UriBuilder(GOOGLE_SCHOLAR_URL_BASE)
             {
                 Path = "scholar",
-                Query = $"?q={HttpUtility.UrlEncode(query)}"
+                Query = query
             };
 
             driver.Navigate().GoToUrl(uri.ToString());

@@ -36,11 +36,11 @@ namespace IEIPaperSearch.Pages
 
         [BindProperty]
         [Range(1000,3000)]
-        public uint StartingYear { get; set; }
+        public uint? StartYear { get; set; }
         [BindProperty]
         [Range(1000,3000)]
-        [GreaterThanOrEqualTo("StartingYear", ErrorMessage = "El año de final debe ser mayor o igual que el año de inicio.")]
-        public uint EndYear { get; set; }
+        [GreaterThanOrEqualTo("StartYear", ErrorMessage = "El año de final debe ser mayor o igual que el año de inicio.")]
+        public uint? EndYear { get; set; }
 
         [BindProperty]
         public bool FormLocked { get; set; }
@@ -52,9 +52,9 @@ namespace IEIPaperSearch.Pages
                 ModelState.AddModelError("", "Selecciona al menos una fuente.");
             }
 
-            if (LoadFromGoogleScholar && string.IsNullOrWhiteSpace(GoogleScholarQuery))
+            if (LoadFromGoogleScholar && (StartYear is null || EndYear is null) && string.IsNullOrWhiteSpace(GoogleScholarQuery))
             {
-                ModelState.AddModelError("", "Como has seleccionado Google Scholar, debes introducir una consulta.");
+                ModelState.AddModelError("", "Como has seleccionado Google Scholar, debes introducir una consulta o un intervalo de años.");
             }
 
             if (!ModelState.IsValid)
@@ -86,12 +86,12 @@ namespace IEIPaperSearch.Pages
                 if (LoadFromGoogleScholar)
                 {
                     TempData.Put<DataLoaderResult>("LoadResults.GoogleScholar", 
-                        ExtractFromOneSource(() => loaderService.LoadFromGoogleScholar(GoogleScholarQuery!), "Google Scholar"));
+                        ExtractFromOneSource((startYear, endYear) => loaderService.LoadFromGoogleScholar(startYear, endYear, GoogleScholarQuery!), "Google Scholar"));
                 }
             });
         }
 
-        delegate DataLoaderResult ExtractionFunction();
+        delegate DataLoaderResult ExtractionFunction(int? startYear, int? endYear);
 
         DataLoaderResult ExtractFromOneSource(ExtractionFunction extract, string errorDiscriminator)
         {
@@ -99,7 +99,7 @@ namespace IEIPaperSearch.Pages
             var errors = new List<string>();
             try
             {
-                result = extract();
+                result = extract((int)StartYear, (int)EndYear);
             }
             catch (Exception e)
             {

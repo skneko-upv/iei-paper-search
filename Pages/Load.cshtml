@@ -40,6 +40,18 @@
             </td>
         </tr>
     </table><br>
+    <table>
+        <tr>
+            <td>
+                Año: &nbsp;&nbsp; desde &nbsp;
+                <input id="year_from" asp-for="StartYear" value="1990" />&nbsp;
+                hasta &nbsp;
+                <input id="year_to" asp-for="EndYear" value="2020" />
+                <span asp-validation-for="StartYear" class="text-danger"></span>
+                <span asp-validation-for="EndYear" class="text-danger"></span>
+            </td>
+        </tr>
+    </table>
     <div>
         <br><br>
         <input @(Model.FormLocked ? "disabled" : "") type="submit" value="Cargar" class="btn btn-primary" />&nbsp;&nbsp;

@@ -72,7 +72,8 @@ namespace IEIPaperSearch.Controllers
         }
 
         /// <summary>
-        /// Extract data from known external sources and insert it into the local persistent storage.
+        /// Extract data from known external sources and insert it into the local persistent storage, filtered by publication
+        /// year.
         /// </summary>
         /// <remarks>
         /// This procedure will normalize, consolidate and deduplicate data from the different diverging schemes of each
@@ -83,6 +84,8 @@ namespace IEIPaperSearch.Controllers
         /// this operation will silently skip errors and may finish successfully after having partially or totally ignored some 
         /// of the selected sources. The caller is advised to examine the resulting error log.
         /// </remarks>
+        /// <param name="startYear">The minimum (inclusive) publication year to include.</param>
+        /// <param name="endYear">The maximum (inclusive) publication year to include.</param>
         /// <param name="useDblp">Set to true to include submissions from DBLP static XML data.</param>
         /// <param name="useIeeeXplore">Set to true to include submissions from the IEEE Xplore REST API.</param>
         /// <param name="useGoogleScholar">Set to true to include submissions scraped from the Google Scholar website.</param>
@@ -94,16 +97,20 @@ namespace IEIPaperSearch.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<IDataLoaderService.DataLoaderResult> LoadFromExternalSources(bool useDblp, bool useIeeeXplore, bool useGoogleScholar, string? googleScholarQuery)
+        public ActionResult<IDataLoaderService.DataLoaderResult> LoadFromExternalSources(bool useDblp, bool useIeeeXplore, bool useGoogleScholar, uint? startYear, uint? endYear, string? googleScholarQuery)
         {
             if (!useDblp && !useIeeeXplore && !useGoogleScholar)
             {
                 return BadRequest("At least one external source must be selected.");
             }
-
-            if (useGoogleScholar && string.IsNullOrWhiteSpace(googleScholarQuery))
+            if (startYear is not null && endYear is not null && endYear < startYear)
             {
-                return BadRequest("You must introduce a Google Scholar query because you have selected to use Google Scholar.");
+                return BadRequest("End year cannot be before starting year.");
+            }
+
+            if (useGoogleScholar && (startYear is not null || endYear is not null) && string.IsNullOrWhiteSpace(googleScholarQuery))
+            {
+                return BadRequest("You must introduce a Google Scholar query because you have selected to use Google Scholar and no year interval has been provided.");
             }
 
             var result = new IDataLoaderService.DataLoaderResult(0);
@@ -112,7 +119,7 @@ namespace IEIPaperSearch.Controllers
             {
                 try
                 {
-                    result += loaderService.LoadFromDblp();
+                    result += loaderService.LoadFromDblp((int?)startYear, (int?)endYear);
                 }
                 catch (Exception e)
                 {
@@ -124,7 +131,7 @@ namespace IEIPaperSearch.Controllers
             {
                 try
                 {
-                    result += loaderService.LoadFromIeeeXplore();
+                    result += loaderService.LoadFromIeeeXplore((int?)startYear, (int?)endYear);
                 }
                 catch (Exception e)
                 {
@@ -136,7 +143,7 @@ namespace IEIPaperSearch.Controllers
             {
                 try
                 {
-                    result += loaderService.LoadFromGoogleScholar(googleScholarQuery!);
+                    result += loaderService.LoadFromGoogleScholar((int?)startYear, (int?)endYear, googleScholarQuery);
                 }
                 catch (Exception e)
                 {

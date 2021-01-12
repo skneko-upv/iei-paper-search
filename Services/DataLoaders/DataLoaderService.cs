@@ -5,6 +5,7 @@ using IEIPaperSearch.DataExtractors.IeeeXplore;
 using IEIPaperSearch.DataSourceWrappers.DBLP;
 using IEIPaperSearch.DataSourceWrappers.GoogleScholar;
 using IEIPaperSearch.DataSourceWrappers.IeeeXplore;
+using IEIPaperSearch.Models;
 using IEIPaperSearch.Persistence;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -36,7 +37,7 @@ namespace IEIPaperSearch.Services.DataLoaders
             this.context = context;
         }
 
-        public DataLoaderResult LoadFromDblp()
+        public DataLoaderResult LoadFromDblp(int? startYear, int? endYear)
         {
             Console.WriteLine("Started DBLP data extraction...");
 
@@ -50,29 +51,31 @@ namespace IEIPaperSearch.Services.DataLoaders
             Console.WriteLine("Inserting DBLP data into database...");
             var count = ExtractFromJsonSource(
                 new DblpDataExtractor(context, "#text"),
-                new DblpXmlConverterWrapper().ExtractFromXml(xml));
+                new DblpXmlConverterWrapper().ExtractFromXml(xml),
+                startYear,
+                endYear);
 
             Console.WriteLine($"done extracting DBLP data ({count} entries).");
 
             return new DataLoaderResult(count);
         }
 
-        public DataLoaderResult LoadFromIeeeXplore()
+        public DataLoaderResult LoadFromIeeeXplore(int? startYear, int? endYear)
         {
             Console.WriteLine("Started IEEE Xplore data extraction...");
 
             var wrapper = new IeeeXploreApiWrapper();
 
             Console.WriteLine("Inserting IEEE Xplore articles data into database (1/3)...");
-            var articles = wrapper.ExtractFromApi(IEEE_XPLORE_LIMIT_PER_TYPE, IeeeXploreSubmissionKind.Articles).Result;
+            var articles = wrapper.ExtractFromApi(IEEE_XPLORE_LIMIT_PER_TYPE, IeeeXploreSubmissionKind.Articles, startYear, endYear).Result;
             ExtractFromJsonSource(new IeeeXploreDataExtractor(context), articles);
 
             Console.WriteLine("Inserting IEEE Xplore books data into database (2/3)...");
-            var books = wrapper.ExtractFromApi(IEEE_XPLORE_LIMIT_PER_TYPE, IeeeXploreSubmissionKind.Books).Result;
+            var books = wrapper.ExtractFromApi(IEEE_XPLORE_LIMIT_PER_TYPE, IeeeXploreSubmissionKind.Books, startYear, endYear).Result;
             var count = ExtractFromJsonSource(new IeeeXploreDataExtractor(context), books);
 
             Console.WriteLine("Inserting IEEE Xplore inproceedings data into database (3/3)...");
-            var inProceedings = wrapper.ExtractFromApi(IEEE_XPLORE_LIMIT_PER_TYPE, IeeeXploreSubmissionKind.InProceedings).Result;
+            var inProceedings = wrapper.ExtractFromApi(IEEE_XPLORE_LIMIT_PER_TYPE, IeeeXploreSubmissionKind.InProceedings, startYear, endYear).Result;
             ExtractFromJsonSource(new IeeeXploreDataExtractor(context), inProceedings);
 
             Console.WriteLine($"done extracting IEEE Xplore data ({count} entries).");
@@ -80,7 +83,7 @@ namespace IEIPaperSearch.Services.DataLoaders
             return new DataLoaderResult(count);
         }
 
-        public DataLoaderResult LoadFromGoogleScholar(string query)
+        public DataLoaderResult LoadFromGoogleScholar(int? startYear, int? endYear, string? query)
         {
             Console.WriteLine("Started Google Scholar data extraction...");
 
@@ -98,7 +101,7 @@ namespace IEIPaperSearch.Services.DataLoaders
             using (webDriver)
             using (var scrapper = new GoogleScholarSeleniumScraper(webDriver, GSCHLOAR_PAGE_LIMIT))
             {
-                scrapped = scrapper.Scrap(query);
+                scrapped = scrapper.Scrap(startYear, endYear, query);
             }
 
             Console.WriteLine("Coverting Google Scholar Bibtex data to JSON...");
@@ -115,22 +118,38 @@ namespace IEIPaperSearch.Services.DataLoaders
             return new DataLoaderResult(count);
         }
 
-        private int ExtractFromJsonSource(IJsonDataExtractor<SubmissionDataExtractorResult> extractor, string json)
+        private int ExtractFromJsonSource(IJsonDataExtractor<SubmissionDataExtractorResult> extractor, string json, int? startYear = null, int? endYear = null)
         {
-            var data = extractor.Extract(json);
+            var (books, articles, inProceedings) = extractor.Extract(json);
             var count = 0;
             
-            context.Books.AddRange(data.Books);
-            count += data.Books.Count;
+            context.Books.AddRange((IEnumerable<Book>)FilterByYear(books, startYear, endYear));
+            count += books.Count;
             
-            context.Articles.AddRange(data.Articles);
-            count += data.Articles.Count;
+            context.Articles.AddRange((IEnumerable<Article>)FilterByYear(articles, startYear, endYear));
+            count += articles.Count;
             
-            context.InProceedings.AddRange(data.InProceedings);
-            count += data.InProceedings.Count;
+            context.InProceedings.AddRange(FilterByYear(inProceedings, startYear, endYear));
+            count += inProceedings.Count;
 
             context.SaveChanges();
             return count;
+        }
+
+        private IQueryable<T> FilterByYear<T>(ICollection<T> collection, int? startYear, int? endYear)
+            where T : Submission
+        {
+            var query = (IQueryable<T>)collection;
+            if (startYear is not null)
+            {
+                query = query.Where(s => s.Year >= startYear);
+            }
+            if (endYear is not null)
+            {
+                query = query.Where(s => s.Year <= endYear);
+            }
+
+            return query;
         }
     }
 }
