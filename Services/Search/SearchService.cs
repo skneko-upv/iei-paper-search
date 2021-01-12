@@ -58,7 +58,7 @@ namespace IEIPaperSearch.Services.Search
             }
             if (author is not null)
             {
-                query = query.Where(e => e.Authors.Contains(new Person(author)));
+                query = query.Where(e => e.Authors.Any(a => a.Name.Contains(author) || a.Surnames.Contains(author)));
             }
             if (startingYear is not null)
             {
