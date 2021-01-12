@@ -99,7 +99,7 @@ namespace IEIPaperSearch.Pages
             var errors = new List<string>();
             try
             {
-                result = extract((int)StartYear, (int)EndYear);
+                result = extract((int?)StartYear, (int?)EndYear);
             }
             catch (Exception e)
             {

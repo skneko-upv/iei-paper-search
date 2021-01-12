@@ -9,19 +9,19 @@ namespace IEIPaperSearch.Services.DataLoaders
         /// Load data from DBLP static XML files into the local persistent storage.
         /// </summary>
         /// <returns>The number of new submissions added.</returns>
-        public DataLoaderResult LoadFromDblp(int? startingYear, int? endYear);
+        public DataLoaderResult LoadFromDblp(int? startYear, int? endYear);
 
         /// <summary>
         /// Load data from the IEEE Xplore REST API files into the local persistent storage.
         /// </summary>
         /// <returns>The number of new submissions added.</returns>
-        public DataLoaderResult LoadFromIeeeXplore(int? startingYear, int? endYear);
+        public DataLoaderResult LoadFromIeeeXplore(int? startYear, int? endYear);
 
         /// <summary>
         /// Load scraped data from the Google Scholar website into the local persistent storage.
         /// </summary>
         /// <returns>The number of new submissions added.</returns>
-        public DataLoaderResult LoadFromGoogleScholar(int? startingYear, int? endYear, string? query);
+        public DataLoaderResult LoadFromGoogleScholar(int? startYear, int? endYear, string? query);
 
         /// <summary>
         /// An aggregation of diagnostic data of a data loading procedure.

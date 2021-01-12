@@ -120,13 +120,13 @@ namespace IEIPaperSearch.Services.DataLoaders
 
         private int ExtractFromJsonSource(IJsonDataExtractor<SubmissionDataExtractorResult> extractor, string json, int? startYear = null, int? endYear = null)
         {
-            var (books, articles, inProceedings) = extractor.Extract(json);
+            var (articles, books, inProceedings) = extractor.Extract(json);
             var count = 0;
             
-            context.Books.AddRange((IEnumerable<Book>)FilterByYear(books, startYear, endYear));
+            context.Books.AddRange(FilterByYear(books, startYear, endYear));
             count += books.Count;
             
-            context.Articles.AddRange((IEnumerable<Article>)FilterByYear(articles, startYear, endYear));
+            context.Articles.AddRange(FilterByYear(articles, startYear, endYear));
             count += articles.Count;
             
             context.InProceedings.AddRange(FilterByYear(inProceedings, startYear, endYear));
@@ -136,10 +136,10 @@ namespace IEIPaperSearch.Services.DataLoaders
             return count;
         }
 
-        private IQueryable<T> FilterByYear<T>(ICollection<T> collection, int? startYear, int? endYear)
+        private IEnumerable<T> FilterByYear<T>(ICollection<T> collection, int? startYear, int? endYear)
             where T : Submission
         {
-            var query = (IQueryable<T>)collection;
+            var query = (IEnumerable<T>)collection;
             if (startYear is not null)
             {
                 query = query.Where(s => s.Year >= startYear);
