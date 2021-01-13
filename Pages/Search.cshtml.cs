@@ -41,7 +41,7 @@ namespace IEIPaperSearch.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (string.IsNullOrWhiteSpace(Author) && string.IsNullOrWhiteSpace(Title))
+            if (string.IsNullOrWhiteSpace(Author) && string.IsNullOrWhiteSpace(Title) && StartingYear is null && EndYear is null)
             {
                 ModelState.AddModelError("", "Introduzca algún término de búsqueda.");
             }

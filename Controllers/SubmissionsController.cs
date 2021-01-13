@@ -46,9 +46,9 @@ namespace IEIPaperSearch.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<IEnumerable<SubmissionDto>> Search(string? author, string? title, uint? startingYear, uint? endYear, bool findArticles, bool findBooks, bool findInProceedings)
         {
-            if (author is null && title is null)
+            if (author is null && title is null && startingYear is null && endYear is null)
             {
-                return BadRequest("Include at least one author or title query.");
+                return BadRequest("Include at least one author, title or years query.");
             }
             if (!findArticles && !findBooks && !findInProceedings)
             {
